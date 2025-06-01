@@ -1,28 +1,18 @@
-// Dear ImGui: standalone example application for SDL2 + SDL_Renderer
-// (SDL is a cross-platform general purpose library for handling windows, inputs, OpenGL/Vulkan/Metal graphics context creation, etc.)
-
-// Learn about Dear ImGui:
-// - FAQ                  https://dearimgui.com/faq
-// - Getting Started      https://dearimgui.com/getting-started
-// - Documentation        https://dearimgui.com/docs (same as your local docs/ folder).
-// - Introduction, links and more at the top of imgui.cpp
-
-// Important to understand: SDL_Renderer is an _optional_ component of SDL2.
-// For a multi-platform app consider using e.g. SDL+DirectX on Windows and SDL+OpenGL on Linux/OSX.
-
 #include "imgui.h"
 #include "backends/imgui_impl_sdl2.h"
 #include "backends/imgui_impl_sdlrenderer2.h"
-#include <stdio.h>
-#include <SDL.h>
 
+#include "SDL.h"
+
+#include <cmath>
+#include <cstdio>
 #include <string>
 #include <vector>
 #include <memory>
+#include <array>
 
-#if !SDL_VERSION_ATLEAST(2,0,17)
-#error This backend requires SDL 2.0.17+ because of SDL_RenderGeometry() function
-#endif
+constexpr float operator"" _mhz(long double val) { return static_cast<float>(val * 1'000'000.0L); }
+constexpr float operator"" _hz(long double val) { return static_cast<float>(val); }
 
 namespace devices
 {
@@ -157,6 +147,261 @@ namespace devices
   };
 }
 
+namespace structures
+{
+  template<typename T, size_t N>
+  struct RingBuffer
+  {
+    static_assert((N& (N - 1)) == 0, "N must be power of two");
+
+  private:
+    std::array<T, N> buffer{};
+    size_t head = 0;
+    size_t tail = 0;
+
+    size_t mask() const { return N - 1; }
+
+  public:
+
+    bool empty() const { return head == tail; }
+    bool full() const { return ((head + 1) & mask()) == tail; }
+    size_t size() const { return (head - tail) & mask(); }
+    size_t capacity() const { return N - 1; }
+
+    void push(const T& value) {
+      assert(!full());
+      buffer[head] = value;
+      head = (head + 1) & mask();
+    }
+
+    void push(T&& value) {
+      assert(!full());
+      buffer[head] = std::move(value);
+      head = (head + 1) & mask();
+    }
+
+    void push(const T* values, size_t count) {
+      assert(count <= capacity() - size());
+
+      size_t space_to_end = N - head;
+      if (count <= space_to_end) {
+        std::copy(values, values + count, buffer.begin() + head);
+      }
+      else {
+        std::copy(values, values + space_to_end, buffer.begin() + head);
+        std::copy(values + space_to_end, values + count, buffer.begin());
+      }
+      head = (head + count) & mask();
+    }
+
+    T pop()
+    {
+      assert(!empty());
+      T value = std::move(buffer[tail]);
+      tail = (tail + 1) & mask();
+      return value;
+    }
+
+    void pop(T* out, size_t count)
+    {
+      assert(count <= size());
+
+      size_t space_to_end = N - tail;
+      if (count <= space_to_end) {
+        std::copy(buffer.begin() + tail, buffer.begin() + tail + count, out);
+      }
+      else {
+        std::copy(buffer.begin() + tail, buffer.end(), out);
+        std::copy(buffer.begin(), buffer.begin() + (count - space_to_end), out + space_to_end);
+      }
+      tail = (tail + count) & mask();
+    }
+
+    void clear()
+    {
+      head = tail = 0;
+    }
+  };
+}
+
+namespace sounds
+{
+  struct WaveGenerator
+  {
+  protected:
+    float _frequency;
+    float _clock;
+    float _phase;
+
+  public:
+    WaveGenerator(float frequency = 440.0_hz, float clock = 1.0_mhz) : _frequency(frequency), _clock(clock), _phase(0.0f) { }
+    float clock() const { return _clock; }
+  };
+  
+  struct SquareWaveGenerator : public WaveGenerator
+  {
+  public:
+    SquareWaveGenerator(float frequency = 440.0f) : WaveGenerator(frequency) { }
+
+    float next()
+    {
+      /* increment by a clock cycle */
+      _phase += _frequency / _clock;
+      if (_phase >= 1.0f)
+        _phase -= 1.0f;
+
+      return _phase < 0.5f ? 1.0f : -1.0f; // Return high or low based on phase
+    }
+  };
+
+  struct TriangleWaveGenerator : public WaveGenerator
+  {
+  public:
+    TriangleWaveGenerator(float frequency = 440.0f) : WaveGenerator(frequency) { }
+
+    float next()
+    {
+      /* increment by a clock cycle */
+      _phase += _frequency / _clock;
+      if (_phase >= 1.0f)
+        _phase -= 1.0f;
+
+      return 2.0f * std::abs(_phase - 0.5f) - 1.0f; // Return triangle wave value
+    }
+  };
+
+  enum class Waveform { Square, Triangle, Sawtooth, Sine };
+
+  class SimpleWaveGenerator : public WaveGenerator
+  {
+    Waveform _type;
+
+  public:
+    SimpleWaveGenerator(Waveform type, float frequency, float clock = 1.0_mhz) 
+      : WaveGenerator(frequency, clock), _type(type) { }
+
+    float next()
+    {
+      _phase += _frequency / _clock;
+      if (_phase >= 1.0f) _phase -= 1.0f;
+
+      switch (_type)
+      {
+        case Waveform::Square: return (_phase < 0.5f) ? 1.0f : -1.0f;
+        case Waveform::Sawtooth: return 2.0f * _phase - 1.0f;
+        case Waveform::Triangle: return (_phase < 0.5f) ? (4.0f * _phase - 1.0f) : (3.0f - 4.0f * _phase);
+        case Waveform::Sine: return std::sinf(2.0f * M_PI * _phase);
+      }
+
+      return 0.0f;
+    }
+  };
+}
+
+struct Platform
+{
+protected:
+  SDL_AudioDeviceID _audioDevice;
+public:
+  Platform();
+
+  bool initAudio();
+  void closeAudio();
+
+  bool init();
+
+  static void audioCallback(void* userdata, uint8_t* stream, int len);
+};
+
+Platform::Platform() : _audioDevice(0) { }
+
+bool Platform::initAudio()
+{
+  SDL_AudioSpec want{}, have{};
+  want.freq = 44100;
+  want.format = AUDIO_F32SYS;
+  want.channels = 1;
+  want.samples = 512;
+  want.callback = audioCallback;
+  want.userdata = this;
+
+  _audioDevice = SDL_OpenAudioDevice(nullptr, 0, &want, &have, 0);
+  if (!_audioDevice)
+  {
+    fprintf(stderr, "Failed to open audio: %s\n", SDL_GetError());
+    return false;
+  }
+
+  SDL_PauseAudioDevice(_audioDevice, 0);
+
+  return true;
+}
+
+void Platform::closeAudio()
+{
+  if (_audioDevice)
+    SDL_CloseAudioDevice(_audioDevice);
+}
+
+sounds::SimpleWaveGenerator generator(sounds::Waveform::Square, 440.0f);
+structures::RingBuffer<float, 1024*1024> buffer;
+void Platform::audioCallback(void* userdata, uint8_t* data, int len)
+{
+  float* stream = reinterpret_cast<float*>(data);
+  len /= sizeof(float);
+
+  float downsampleRatio = generator.clock() / 44100.0f;
+  const size_t requiredSamples = static_cast<size_t>(len * downsampleRatio) + 1;
+
+  /* generate samples */
+  for (size_t i = 0; i < requiredSamples; ++i)
+  {
+    float sample = generator.next();
+    buffer.push(sample);
+  }
+
+  float cursor = 0.0f;
+  for (int i = 0; i < len; ++i)
+  {
+    float acc = 0.0f;
+    int count = 0;
+
+    while (cursor < 1.0f)
+    {
+      acc += buffer.pop();
+      count++;
+      cursor += 1.0f / downsampleRatio;
+    }
+
+    cursor -= 1.0f;
+    stream[i] = (acc / static_cast<float>(count)) * 0.05f;
+  }
+
+  float averageSampleValue = 0.0f;
+  for (int i = 0; i < len; ++i)
+  {
+    averageSampleValue += stream[i];
+  }
+  averageSampleValue /= len;
+}
+
+bool Platform::init()
+{
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO) != 0)
+  {
+    printf("Error: %s\n", SDL_GetError());
+    return false;
+  }
+
+#ifdef SDL_HINT_IME_SHOW_UI
+  SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
+#endif
+
+  return initAudio();
+}
+
+Platform platform;
+
 // Main code
 int main(int, char**)
 {
@@ -164,17 +409,7 @@ int main(int, char**)
   auto* ram = machine.add<devices::Ram>(0x10000); // 64KB RAM
   machine.bus().map(ram, 0x0000, 0xFFFF);
   
-  // Setup SDL
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER) != 0)
-  {
-    printf("Error: %s\n", SDL_GetError());
-    return -1;
-  }
-
-  // From 2.0.18: Enable native IME.
-#ifdef SDL_HINT_IME_SHOW_UI
-  SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
-#endif
+  platform.init();
 
   // Create window with SDL_Renderer graphics context
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
@@ -397,6 +632,9 @@ int main(int, char**)
 
   SDL_DestroyRenderer(renderer);
   SDL_DestroyWindow(window);
+
+  platform.closeAudio();
+
   SDL_Quit();
 
   return 0;
