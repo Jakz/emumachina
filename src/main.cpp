@@ -10,9 +10,13 @@
 #include <vector>
 #include <memory>
 #include <array>
+#include <algorithm>
 
 constexpr float operator"" _mhz(long double val) { return static_cast<float>(val * 1'000'000.0L); }
+constexpr float operator"" _khz(long double val) { return static_cast<float>(val * 1'000.0f); }
 constexpr float operator"" _hz(long double val) { return static_cast<float>(val); }
+
+constexpr uint32_t operator"" _kb(unsigned long long val) { return val * 1024; }
 
 namespace devices
 {
@@ -240,8 +244,13 @@ namespace sounds
   
   struct SquareWaveGenerator : public WaveGenerator
   {
+  protected:
+    float _duty;
+
   public:
-    SquareWaveGenerator(float frequency = 440.0f) : WaveGenerator(frequency) { }
+    SquareWaveGenerator(float frequency = 440.0f) : WaveGenerator(frequency), _duty(0.5f) { }
+
+    void setDuty(float duty) { _duty = std::clamp(duty, 0.0f, 1.0f); }
 
     float next()
     {
@@ -250,7 +259,7 @@ namespace sounds
       if (_phase >= 1.0f)
         _phase -= 1.0f;
 
-      return _phase < 0.5f ? 1.0f : -1.0f; // Return high or low based on phase
+      return _phase < _duty ? 1.0f : -1.0f; // Return high or low based on phase
     }
   };
 
@@ -279,6 +288,9 @@ namespace sounds
   public:
     SimpleWaveGenerator(Waveform type, float frequency, float clock = 1.0_mhz) 
       : WaveGenerator(frequency, clock), _type(type) { }
+
+    void waveform(Waveform type) { _type = type; }
+    void frequency(float frequency) { _frequency = frequency; }
 
     float next()
     {
@@ -315,6 +327,40 @@ namespace sounds
       return (value / 2.0f) - 1.0f;
     }
   };
+
+  namespace filters
+  {
+    class LowPassFilter
+    {
+    protected:
+      float _cutoff;
+      float _sampleRate;
+      float _alpha;
+      float _prevOutput;
+
+    public:
+      LowPassFilter(float cutoff, float sampleRate) :
+        _cutoff(cutoff), _sampleRate(sampleRate), _prevOutput(0.0f)
+      {
+        updateAlpha();
+      }
+
+      void updateAlpha()
+      {
+        float dt = 1.0f / _sampleRate;
+        float rc = 1.0f / (2.0f * M_PI * _cutoff);
+        _alpha = dt / (rc + dt);
+      }
+
+      float process(float input)
+      {
+        float output = _prevOutput + (_alpha * (input - _prevOutput));
+        _prevOutput = output;
+        return output;
+      }
+    };
+  }
+  
 }
 
 struct Platform
@@ -362,20 +408,111 @@ void Platform::closeAudio()
     SDL_CloseAudioDevice(_audioDevice);
 }
 
-sounds::SimpleWaveGenerator generator(sounds::Waveform::Sawtooth, 440.0_hz);
-structures::RingBuffer<float, 1024*1024> buffer;
+bool Platform::init()
+{
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO) != 0)
+  {
+    printf("Error: %s\n", SDL_GetError());
+    return false;
+  }
+
+#ifdef SDL_HINT_IME_SHOW_UI
+  SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
+#endif
+
+  return initAudio();
+}
+
+Platform platform;
+
+namespace ImGui
+{
+  template<typename Enum>
+  bool RadioButton(const char* label, Enum& current, Enum value) {
+    int i = static_cast<int>(current);
+    bool changed = ImGui::RadioButton(label, &i, static_cast<int>(value));
+    if (changed)
+      current = static_cast<Enum>(i);
+    return changed;
+  }
+}
+
+namespace ui::windows
+{
+  class WaveGeneratorWindow
+  {
+  protected:
+    sounds::SimpleWaveGenerator _generator;    
+    sounds::Waveform _waveform;
+    float _frequency;
+    float _volume;
+
+  public:
+    WaveGeneratorWindow() : _generator(sounds::Waveform::Square, 440.0_hz, 1.0_mhz),
+      _waveform(sounds::Waveform::Square), _frequency(440.0_hz), _volume(0.5f)
+    {
+    
+    }
+
+    void render();
+    float clock() const { return _generator.clock(); }
+    float next() { return _generator.next(); }
+  };
+}
+
+namespace ui
+{
+  struct UI
+  {
+    struct
+    {
+      ui::windows::WaveGeneratorWindow waveGenerator;
+    } windows;
+  };
+}
+
+void ui::windows::WaveGeneratorWindow::render()
+{
+  ImGui::Begin("Waveform Controls");
+
+  ImGui::Text("Select Waveform:");
+
+  ImGui::RadioButton("Square", _waveform, sounds::Waveform::Square);
+  ImGui::RadioButton("Triangle", _waveform, sounds::Waveform::Triangle);
+  ImGui::RadioButton("Sawtooth", _waveform, sounds::Waveform::Sawtooth);
+  ImGui::RadioButton("Sine", _waveform, sounds::Waveform::Sine);
+  _generator.waveform(_waveform);
+
+  ImGui::Spacing();
+  ImGui::Text("Frequency(Hz)");
+  ImGui::SliderFloat("##freqSlider", &_frequency, 20.0f, 20000.0f, "");
+  ImGui::SameLine();
+  ImGui::InputFloat("##freqText", &_frequency, 20.0f, 20000.0f, "%.1f");
+
+  ImGui::SliderFloat("Volume", &_volume, 0.0f, 1.0f, "%.2f");
+  _generator.frequency(_frequency);
+
+  ImGui::End();
+}
+
+ui::UI gui;
+
+
+structures::RingBuffer<float, 1024 * 1024> buffer;
+sounds::filters::LowPassFilter filter(4.0_khz, 44100.0f); // Low-pass filter with 1kHz cutoff
+
 void Platform::audioCallback(void* userdata, uint8_t* data, int len)
 {
   float* stream = reinterpret_cast<float*>(data);
   len /= sizeof(float);
 
-  float downsampleRatio = generator.clock() / 44100.0f;
+  float downsampleRatio = gui.windows.waveGenerator.clock() / 44100.0f;
   const size_t requiredSamples = static_cast<size_t>(len * downsampleRatio) + 1;
 
   /* generate samples */
   for (size_t i = 0; i < requiredSamples; ++i)
   {
-    float sample = generator.next();
+    float sample = gui.windows.waveGenerator.next();
     buffer.push(sample);
   }
 
@@ -394,32 +531,9 @@ void Platform::audioCallback(void* userdata, uint8_t* data, int len)
 
     cursor -= 1.0f;
     stream[i] = (acc / static_cast<float>(count)) * 0.05f;
+    stream[i] = filter.process(stream[i]);
   }
-
-  float averageSampleValue = 0.0f;
-  for (int i = 0; i < len; ++i)
-  {
-    averageSampleValue += stream[i];
-  }
-  averageSampleValue /= len;
 }
-
-bool Platform::init()
-{
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO) != 0)
-  {
-    printf("Error: %s\n", SDL_GetError());
-    return false;
-  }
-
-#ifdef SDL_HINT_IME_SHOW_UI
-  SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
-#endif
-
-  return initAudio();
-}
-
-Platform platform;
 
 // Main code
 int main(int, char**)
@@ -479,10 +593,10 @@ int main(int, char**)
   //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
   //IM_ASSERT(font != nullptr);
 
-  // Our state
-  bool show_demo_window = false;
-  bool show_another_window = false;
   ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+  SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, 256, 256);
+  
 
   // Main loop
   bool done = false;
@@ -513,41 +627,29 @@ int main(int, char**)
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
+    ImGui::Begin("Framebuffer", nullptr);
 
-    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
+    void* tex_pixels;
+    int tex_pitch;
+    if (SDL_LockTexture(texture, NULL, &tex_pixels, &tex_pitch) == 0)
     {
-      static float f = 0.0f;
-      static int counter = 0;
-
-      ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-
-      ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-      ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-      ImGui::Checkbox("Another Window", &show_another_window);
-
-      ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-      ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-
-      if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-        counter++;
-      ImGui::SameLine();
-      ImGui::Text("counter = %d", counter);
-
-      ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / io.Framerate, io.Framerate);
-      ImGui::End();
+      // Fill the texture with a checkerboard pattern
+      uint32_t* pixels = static_cast<uint32_t*>(tex_pixels);
+      for (int y = 0; y < 256; ++y)
+      {
+        for (int x = 0; x < 256; ++x)
+        {
+          uint32_t color = ((x / 32 + y / 32) % 2 == 0) ? 0xFF0000FF : 0xFFFFFFFF; // Red and White checkerboard
+          pixels[y * (tex_pitch / sizeof(uint32_t)) + x] = color;
+        }
+      }
+      SDL_UnlockTexture(texture);
     }
 
-    // 3. Show another simple window.
-    if (show_another_window)
-    {
-      ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-      ImGui::Text("Hello from another window!");
-      if (ImGui::Button("Close Me"))
-        show_another_window = false;
-      ImGui::End();
-    }
+    ImGui::Image((ImTextureID)texture, ImVec2(256, 256));
+    ImGui::End();
 
-    if (true)
+    if (false)
     {
       
       ImGui::Begin("RAM Viewer", nullptr);
@@ -629,8 +731,11 @@ int main(int, char**)
         ImGui::EndTable();
       }
 
+
       ImGui::End();
     }
+
+    gui.windows.waveGenerator.render();
 
     // Rendering
     ImGui::Render();
