@@ -296,6 +296,25 @@ namespace sounds
       return 0.0f;
     }
   };
+
+  struct NoiseGenerator : public WaveGenerator
+  {
+  protected:
+    uint32_t lfsr = 0x7FFFFF;
+
+  public:
+    NoiseGenerator(float clock = 1.0_mhz) : WaveGenerator(0.0f, clock) { }
+
+    float next()
+    {
+      // XOR taps at bit 22 and 17
+      uint32_t new_bit = ((lfsr >> 22) ^ (lfsr >> 17)) & 1;
+      lfsr = ((lfsr << 1) | new_bit) & 0x7FFFFF;
+      uint8_t value = (lfsr >> 15) & 0xFF;
+
+      return (value / 2.0f) - 1.0f;
+    }
+  };
 }
 
 struct Platform
@@ -343,7 +362,7 @@ void Platform::closeAudio()
     SDL_CloseAudioDevice(_audioDevice);
 }
 
-sounds::SimpleWaveGenerator generator(sounds::Waveform::Square, 440.0f);
+sounds::NoiseGenerator generator;
 structures::RingBuffer<float, 1024*1024> buffer;
 void Platform::audioCallback(void* userdata, uint8_t* data, int len)
 {
