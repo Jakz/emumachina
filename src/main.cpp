@@ -362,7 +362,7 @@ void Platform::closeAudio()
     SDL_CloseAudioDevice(_audioDevice);
 }
 
-sounds::NoiseGenerator generator;
+sounds::SimpleWaveGenerator generator(sounds::Waveform::Sawtooth, 440.0_hz);
 structures::RingBuffer<float, 1024*1024> buffer;
 void Platform::audioCallback(void* userdata, uint8_t* data, int len)
 {
@@ -432,7 +432,7 @@ int main(int, char**)
 
   // Create window with SDL_Renderer graphics context
   SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-  SDL_Window* window = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1920, 1080, window_flags);
+  SDL_Window* window = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
   if (window == nullptr)
   {
     printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
@@ -513,9 +513,6 @@ int main(int, char**)
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
 
-    // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-    if (show_demo_window)
-      ImGui::ShowDemoWindow(&show_demo_window);
 
     // 2. Show a simple window that we create ourselves. We use a Begin/End pair to create a named window.
     {
