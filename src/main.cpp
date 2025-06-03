@@ -503,6 +503,8 @@ sounds::filters::LowPassFilter filter(4.0_khz, 44100.0f); // Low-pass filter wit
 
 void Platform::audioCallback(void* userdata, uint8_t* data, int len)
 {
+  return;
+  
   float* stream = reinterpret_cast<float*>(data);
   len /= sizeof(float);
 
@@ -633,16 +635,35 @@ int main(int, char**)
     int tex_pitch;
     if (SDL_LockTexture(texture, NULL, &tex_pixels, &tex_pitch) == 0)
     {
-      // Fill the texture with a checkerboard pattern
-      uint32_t* pixels = static_cast<uint32_t*>(tex_pixels);
-      for (int y = 0; y < 256; ++y)
+      struct Star { int x, y; };
+      static std::vector<Star> stars;
+    
+      if (stars.empty())
       {
-        for (int x = 0; x < 256; ++x)
+        stars.reserve(256);
+        for (int i = 0; i < stars.size(); ++i)
         {
-          uint32_t color = ((x / 32 + y / 32) % 2 == 0) ? 0xFF0000FF : 0xFFFFFFFF; // Red and White checkerboard
-          pixels[y * (tex_pitch / sizeof(uint32_t)) + x] = color;
+          stars.push_back({ rand() % 256, rand() % 256 });
         }
       }
+
+      // Clear the texture
+      uint32_t randomColor = 0xffff00ff;
+      std::fill_n(static_cast<uint32_t*>(tex_pixels), (tex_pitch / 4) * 256, randomColor);
+
+      // Draw stars
+      /*for (const auto& star : stars)
+      {
+        int x = star.x;
+        int y = star.y;
+        if (x >= 0 && x < 256 && y >= 0 && y < 256)
+        {
+          uint32_t* pixels = static_cast<uint32_t*>(tex_pixels);
+          pixels[y * (tex_pitch / sizeof(uint32_t)) + x] = 0xFFFFFFFF; // White star
+        }
+      }
+
+      SDL_UpdateTexture(texture, NULL, tex_pixels, tex_pitch);*/
       SDL_UnlockTexture(texture);
     }
 
