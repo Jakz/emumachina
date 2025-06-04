@@ -15,6 +15,9 @@
 #include "common.h"
 #include "devices/component.h"
 
+#include "ui/window.h"
+#include "ui/frame_window.h"
+
 namespace devices
 {
   struct Machine
@@ -355,6 +358,8 @@ namespace ui
     {
       ui::windows::WaveGeneratorWindow waveGenerator;
     } windows;
+
+    ui::WindowManager manager;
   };
 }
 
@@ -424,6 +429,8 @@ void Platform::audioCallback(void* userdata, uint8_t* data, int len)
   }
 }
 
+SDL_Renderer* renderer = nullptr;
+
 // Main code
 int main(int, char**)
 {
@@ -441,7 +448,8 @@ int main(int, char**)
     printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
     return -1;
   }
-  SDL_Renderer* renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
+  
+  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
   if (renderer == nullptr)
   {
     SDL_Log("Error creating SDL_Renderer!");
@@ -486,6 +494,9 @@ int main(int, char**)
 
   SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, 256, 256);
   
+  auto* frameWindow = new ui::FrameWindow("Framebuffer", 256, 256);
+  frameWindow->frameBuffer()->fill(gfx::Pixel(255, 255, 0));
+  gui.manager.add(frameWindow);
 
   // Main loop
   bool done = false;
@@ -515,56 +526,6 @@ int main(int, char**)
     ImGui_ImplSDLRenderer2_NewFrame();
     ImGui_ImplSDL2_NewFrame();
     ImGui::NewFrame();
-
-    ImGui::Begin("Framebuffer", nullptr);
-
-    void* tex_pixels;
-    int tex_pitch;
-    if (SDL_LockTexture(texture, NULL, &tex_pixels, &tex_pitch) == 0)
-    {
-      struct Star { int x, y; };
-      static std::vector<Star> stars;
-    
-      if (stars.empty())
-      {
-        stars.reserve(256);
-        for (int i = 0; i < stars.size(); ++i)
-        {
-          stars.push_back({ rand() % 256, rand() % 256 });
-        }
-      }
-
-      // Clear the texture
-      uint32_t randomColor = rand() % 0xFFFFFF | 0xFF000000;
-      std::fill_n(static_cast<uint32_t*>(tex_pixels), (tex_pitch / 4) * 256, randomColor);
-
-      // Draw stars
-      /*for (const auto& star : stars)
-      {
-        int x = star.x;
-        int y = star.y;
-        if (x >= 0 && x < 256 && y >= 0 && y < 256)
-        {
-          uint32_t* pixels = static_cast<uint32_t*>(tex_pixels);
-          pixels[y * (tex_pitch / sizeof(uint32_t)) + x] = 0xFFFFFFFF; // White star
-        }
-      }
-
-      SDL_UpdateTexture(texture, NULL, tex_pixels, tex_pitch);*/
-      SDL_UnlockTexture(texture);
-    }
-
-    ImVec2 avail = ImGui::GetContentRegionAvail();
-    float scale = std::min(avail.x / 256, avail.y / 256);
-    ImVec2 size = ImVec2(256 * scale, 256 * scale);
-
-    // Per centrare:
-    ImVec2 cursor = ImGui::GetCursorPos();
-    ImGui::SetCursorPos(ImVec2(cursor.x + (avail.x - size.x) * 0.5f,
-      cursor.y + (avail.y - size.y) * 0.5f));
-
-    ImGui::Image((ImTextureID)texture, size);
-    ImGui::End();
 
     if (false)
     {
@@ -653,6 +614,8 @@ int main(int, char**)
     }
 
     gui.windows.waveGenerator.render();
+
+    gui.manager.render();
 
     // Rendering
     ImGui::Render();

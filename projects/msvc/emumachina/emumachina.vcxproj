@@ -90,6 +90,8 @@
     <ClCompile Include="..\..\..\src\main.cpp" />
     <ClCompile Include="..\..\..\src\platform\gameboy\cartridge.cpp" />
     <ClCompile Include="..\..\..\src\platform\gameboy\rtc.cpp" />
+    <ClCompile Include="..\..\..\src\ui\frame_window.cpp" />
+    <ClCompile Include="..\..\..\src\ui\window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\libs\imgui\backends\imgui_impl_sdlrenderer2.h" />
@@ -105,6 +107,8 @@
     <ClInclude Include="..\..\..\src\devices\component.h" />
     <ClInclude Include="..\..\..\src\platform\gameboy\cartridge.h" />
     <ClInclude Include="..\..\..\src\platform\gameboy\rtc.h" />
+    <ClInclude Include="..\..\..\src\ui\frame_window.h" />
+    <ClInclude Include="..\..\..\src\ui\window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
