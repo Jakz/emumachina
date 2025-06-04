@@ -12,11 +12,7 @@
 #include <array>
 #include <algorithm>
 
-constexpr float operator"" _mhz(long double val) { return static_cast<float>(val * 1'000'000.0L); }
-constexpr float operator"" _khz(long double val) { return static_cast<float>(val * 1'000.0f); }
-constexpr float operator"" _hz(long double val) { return static_cast<float>(val); }
-
-constexpr uint32_t operator"" _kb(unsigned long long val) { return val * 1024; }
+#include "common.h"
 
 namespace devices
 {
@@ -648,7 +644,7 @@ int main(int, char**)
       }
 
       // Clear the texture
-      uint32_t randomColor = 0xffff00ff;
+      uint32_t randomColor = rand() % 0xFFFFFF | 0xFF000000;
       std::fill_n(static_cast<uint32_t*>(tex_pixels), (tex_pitch / 4) * 256, randomColor);
 
       // Draw stars

@@ -16,6 +16,10 @@
 		046BD4F42DED25A0001622CC /* imgui_impl_sdlrenderer2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD4F02DED25A0001622CC /* imgui_impl_sdlrenderer2.cpp */; };
 		046BD4F82DED2658001622CC /* libSDL2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 046BD4F62DED2658001622CC /* libSDL2.a */; };
 		046BD4F92DED2658001622CC /* libSDL2main.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 046BD4F72DED2658001622CC /* libSDL2main.a */; };
+		046BD4FF2DEFC365001622CC /* cartridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD4FD2DEFC365001622CC /* cartridge.cpp */; };
+		046BD5022DEFC3C0001622CC /* rtc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD5012DEFC3C0001622CC /* rtc.cpp */; };
+		046BD5082DEFC510001622CC /* file_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD5042DEFC510001622CC /* file_system.cpp */; };
+		046BD5092DEFC510001622CC /* path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD5052DEFC510001622CC /* path.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -49,6 +53,15 @@
 		046BD4F22DED25A0001622CC /* imgui_impl_sdl2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = imgui_impl_sdl2.h; path = ../../../../libs/imgui/backends/imgui_impl_sdl2.h; sourceTree = "<group>"; };
 		046BD4F62DED2658001622CC /* libSDL2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2.a; path = ../../../../../../../opt/homebrew/lib/libSDL2.a; sourceTree = "<group>"; };
 		046BD4F72DED2658001622CC /* libSDL2main.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libSDL2main.a; path = ../../../../../../../opt/homebrew/lib/libSDL2main.a; sourceTree = "<group>"; };
+		046BD4FA2DEFC2CF001622CC /* common.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = common.h; path = ../../src/common.h; sourceTree = "<group>"; };
+		046BD4FD2DEFC365001622CC /* cartridge.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = cartridge.cpp; path = ../../src/platform/gameboy/cartridge.cpp; sourceTree = "<group>"; };
+		046BD4FE2DEFC365001622CC /* cartridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = cartridge.h; path = ../../src/platform/gameboy/cartridge.h; sourceTree = "<group>"; };
+		046BD5002DEFC3C0001622CC /* rtc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = rtc.h; path = ../../src/platform/gameboy/rtc.h; sourceTree = "<group>"; };
+		046BD5012DEFC3C0001622CC /* rtc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rtc.cpp; path = ../../src/platform/gameboy/rtc.cpp; sourceTree = "<group>"; };
+		046BD5042DEFC510001622CC /* file_system.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = file_system.cpp; path = ../../src/base/file_system.cpp; sourceTree = "<group>"; };
+		046BD5052DEFC510001622CC /* path.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = path.cpp; path = ../../src/base/path.cpp; sourceTree = "<group>"; };
+		046BD5062DEFC510001622CC /* path.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = path.h; path = ../../src/base/path.h; sourceTree = "<group>"; };
+		046BD5072DEFC510001622CC /* file_system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = file_system.h; path = ../../src/base/file_system.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -84,7 +97,10 @@
 		046BD4DD2DED2508001622CC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				046BD5032DEFC505001622CC /* base */,
+				046BD4FB2DEFC352001622CC /* platform */,
 				046BD4E02DED2565001622CC /* imgui */,
+				046BD4FA2DEFC2CF001622CC /* common.h */,
 				046BD4DE2DED2519001622CC /* main.cpp */,
 			);
 			name = src;
@@ -118,6 +134,36 @@
 				046BD4F72DED2658001622CC /* libSDL2main.a */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		046BD4FB2DEFC352001622CC /* platform */ = {
+			isa = PBXGroup;
+			children = (
+				046BD4FC2DEFC357001622CC /* gameboy */,
+			);
+			name = platform;
+			sourceTree = "<group>";
+		};
+		046BD4FC2DEFC357001622CC /* gameboy */ = {
+			isa = PBXGroup;
+			children = (
+				046BD5012DEFC3C0001622CC /* rtc.cpp */,
+				046BD5002DEFC3C0001622CC /* rtc.h */,
+				046BD4FD2DEFC365001622CC /* cartridge.cpp */,
+				046BD4FE2DEFC365001622CC /* cartridge.h */,
+			);
+			name = gameboy;
+			sourceTree = "<group>";
+		};
+		046BD5032DEFC505001622CC /* base */ = {
+			isa = PBXGroup;
+			children = (
+				046BD5042DEFC510001622CC /* file_system.cpp */,
+				046BD5072DEFC510001622CC /* file_system.h */,
+				046BD5052DEFC510001622CC /* path.cpp */,
+				046BD5062DEFC510001622CC /* path.h */,
+			);
+			name = base;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -177,11 +223,15 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				046BD5022DEFC3C0001622CC /* rtc.cpp in Sources */,
 				046BD4F32DED25A0001622CC /* imgui_impl_sdl2.cpp in Sources */,
 				046BD4EC2DED2582001622CC /* imgui_draw.cpp in Sources */,
 				046BD4DF2DED2519001622CC /* main.cpp in Sources */,
+				046BD5082DEFC510001622CC /* file_system.cpp in Sources */,
+				046BD4FF2DEFC365001622CC /* cartridge.cpp in Sources */,
 				046BD4ED2DED2582001622CC /* imgui_tables.cpp in Sources */,
 				046BD4EE2DED2582001622CC /* imgui_widgets.cpp in Sources */,
+				046BD5092DEFC510001622CC /* path.cpp in Sources */,
 				046BD4F42DED25A0001622CC /* imgui_impl_sdlrenderer2.cpp in Sources */,
 				046BD4EB2DED2582001622CC /* imgui.cpp in Sources */,
 			);
@@ -308,6 +358,7 @@
 				HEADER_SEARCH_PATHS = (
 					/Users/jack/Documents/Dev/libs/imgui,
 					/opt/homebrew/include/SDL2,
+					/Users/jack/Documents/Dev/emumachina/src,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -326,6 +377,7 @@
 				HEADER_SEARCH_PATHS = (
 					/Users/jack/Documents/Dev/libs/imgui,
 					/opt/homebrew/include/SDL2,
+					/Users/jack/Documents/Dev/emumachina/src,
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
