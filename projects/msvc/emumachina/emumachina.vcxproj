@@ -49,7 +49,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Jack\Documents\dev\libs\imgui;C:\Users\Jack\Documents\dev\libs\sdl\SDL2-2.28.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jack\Documents\dev\libs\imgui;C:\Users\Jack\Documents\dev\libs\sdl\SDL2-2.28.3\include;$(SolutionDir)..\..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -66,7 +66,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Jack\Documents\dev\libs\imgui;C:\Users\Jack\Documents\dev\libs\sdl\SDL2-2.28.3\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jack\Documents\dev\libs\imgui;C:\Users\Jack\Documents\dev\libs\sdl\SDL2-2.28.3\include;$(SolutionDir)..\..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -85,7 +85,11 @@
     <ClCompile Include="..\..\..\..\libs\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\..\..\..\libs\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\..\libs\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\..\..\src\base\file_system.cpp" />
+    <ClCompile Include="..\..\..\src\base\path.cpp" />
     <ClCompile Include="..\..\..\src\main.cpp" />
+    <ClCompile Include="..\..\..\src\platform\gameboy\cartridge.cpp" />
+    <ClCompile Include="..\..\..\src\platform\gameboy\rtc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\libs\imgui\backends\imgui_impl_sdlrenderer2.h" />
@@ -95,6 +99,12 @@
     <ClInclude Include="..\..\..\..\libs\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\..\..\..\libs\imgui\imstb_textedit.h" />
     <ClInclude Include="..\..\..\..\libs\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\..\..\src\base\file_system.h" />
+    <ClInclude Include="..\..\..\src\base\path.h" />
+    <ClInclude Include="..\..\..\src\common.h" />
+    <ClInclude Include="..\..\..\src\devices\component.h" />
+    <ClInclude Include="..\..\..\src\platform\gameboy\cartridge.h" />
+    <ClInclude Include="..\..\..\src\platform\gameboy\rtc.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

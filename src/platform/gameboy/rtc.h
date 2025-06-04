@@ -33,7 +33,7 @@ namespace gb
     {
       latched[selectedReg] = value;
       
-      printf("RTC Write at %02x: %02x\n", BASE_REG+selectedReg, value);
+      //printf("RTC Write at %02x: %02x\n", BASE_REG+selectedReg, value);
       
     }
     

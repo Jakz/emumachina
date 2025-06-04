@@ -62,12 +62,15 @@ public:
   path makeRelative() const;
   
   std::string filename() const;
+  std::string extension() const;
   std::string filenameWithoutExtension() const;
   path withExtension(const path_extension& extension) const;
 
   const std::string& data() const { return _data; }
   const std::string& str() const { return _data; }
   const char* c_str() const { return _data.c_str(); }
+
+  size_t writeAll(const void* data, size_t count, size_t size) const;
   
   friend std::ostream& operator<<(std::ostream& os, const class path& path) { os << path._data; return os; }
 };

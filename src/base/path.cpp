@@ -2,10 +2,8 @@
 
 #include "common.h"
 
-#include <sys/stat.h>
-//#include <dirent.h>
-
 #include "file_system.h"
+#include <filesystem>
 
 namespace fs = std::filesystem;
 static constexpr const char SEPARATOR = '/';
@@ -54,18 +52,12 @@ path path::absolute() const
 
 path path::relativizeToParent(const path& parent) const
 {
-  if (!strings::isPrefixOf(_data, parent._data))
-    throw exceptions::path_non_relative(parent, *this);
-  else
-    return path(_data.substr(parent._data.length()+1));
+  return path(_data.substr(parent._data.length()+1));
 }
 
 path path::relativizeChildren(const path& children) const
 {
-  if (!strings::isPrefixOf(children._data, _data))
-    throw exceptions::path_non_relative(*this, children);
-  else
-    return path(children._data.substr(_data.length()+1));
+  return path(children._data.substr(_data.length()+1));
 }
 
 std::string path::filename() const
@@ -75,11 +67,48 @@ std::string path::filename() const
   return index != std::string::npos ? _data.substr(index+1) : _data;
 }
 
+std::string path::extension() const
+{
+  size_t index = _data.find_last_of('.');
+
+  if (index == std::string::npos)
+    return "";
+
+  size_t sepIndex = _data.find_last_of(SEPARATOR);
+  if (sepIndex != std::string::npos && sepIndex > index)
+    return "";
+
+  return _data.substr(index + 1);
+
+}
+
 std::string path::filenameWithoutExtension() const
 {
   auto filename = this->filename();
   size_t index = filename.find_last_of('.');
   return index != std::string::npos ? filename.substr(0, index) : filename;
+}
+
+size_t path::length() const
+{
+  if (exists() && !isFolder())
+    return fs::file_size(_data);
+  else
+    return 0;
+}
+
+size_t path::writeAll(const void* data, size_t count, size_t size) const
+{
+  FILE* out = fopen(_data.c_str(), "wb");
+
+  if (out)
+  {
+    size_t written = fwrite(data, size, count, out);
+    fclose(out);
+    return written;
+  }
+
+  return 0;
 }
 
 path path::withExtension(const path_extension& extension) const
@@ -92,8 +121,8 @@ bool startsWith(const std::string& str, char c) { return str.front() == c; }
 path path::append(const path& other) const
 {
   if (other.isAbsolute())
-    throw exceptions::path_exception(fmt::format("path::append: children %s can't be absolute", other.c_str()));
-  
+    return *this;
+
   if (_data.empty())
     return other;
   else if (!endsWith(_data,SEPARATOR) && !startsWith(other._data, SEPARATOR))
@@ -141,9 +170,3 @@ path path::makeRelative() const
   return _data[0] == SEPARATOR ? path(&_data[1]) : *this;
 }
 
-size_t path::length() const
-{
-  struct stat sb;
-  stat(_data.c_str(), &sb);
-  return sb.st_size;
-}

@@ -7,6 +7,18 @@
     <Filter Include="src\imgui">
       <UniqueIdentifier>{7596c667-05db-4491-b4f5-e14ffc5c7908}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\base">
+      <UniqueIdentifier>{c20aedc7-f426-4066-9edb-6aa028fcb459}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\platform">
+      <UniqueIdentifier>{0e8d9df6-f1ab-4fc7-96de-6c24151fad29}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\platform\gameboy">
+      <UniqueIdentifier>{36a54a0d-54a8-464f-b632-5443eed3432c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\devices">
+      <UniqueIdentifier>{f8665cd8-1038-4aab-86b0-e9f2a5c6947e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">
@@ -33,6 +45,18 @@
     <ClCompile Include="..\..\..\..\libs\imgui\backends\imgui_impl_sdl2.cpp">
       <Filter>src\imgui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\src\base\file_system.cpp">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\base\path.cpp">
+      <Filter>src\base</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\rtc.cpp">
+      <Filter>src\platform\gameboy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\cartridge.cpp">
+      <Filter>src\platform\gameboy</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\libs\imgui\imstb_rectpack.h">
@@ -55,6 +79,24 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\libs\imgui\backends\imgui_impl_sdlrenderer2.h">
       <Filter>src\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\common.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\base\file_system.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\base\path.h">
+      <Filter>src\base</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\rtc.h">
+      <Filter>src\platform\gameboy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\cartridge.h">
+      <Filter>src\platform\gameboy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\devices\component.h">
+      <Filter>src\devices</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

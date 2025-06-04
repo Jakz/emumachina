@@ -19,7 +19,7 @@ Cartridge::Cartridge()
   status.current_ram_bank = 0;
 }
 
-Cartridge::Cartridge(const std::string& fileName) : Cartridge()
+Cartridge::Cartridge(const path& fileName) : Cartridge()
 {
   load(fileName);
 }
@@ -277,10 +277,10 @@ void Cartridge::init(void)
 	/* TODO: resetta lo status, sonasega */
 }
 
-void Cartridge::load(const std::string& rom_name)
+void Cartridge::load(const path& rom_name)
 {
 	FILE *in = fopen(rom_name.c_str(), "rb");
-	long length = Utils::fileLength(in);
+  long length = rom_name.length();
   
   status.fileName = rom_name;
 	
@@ -290,7 +290,7 @@ void Cartridge::load(const std::string& rom_name)
 	
 	status.flags = 0x00;
   
-  if (header.cgb_flag & 0x80 && rom_name.back() == 'c')
+  if (header.cgb_flag & 0x80 && rom_name.extension() == "gbc")
     status.flags |= MBC_CGB;
 	
 	/* in base al cart_type assegna le flag della rom */
@@ -462,10 +462,8 @@ void Cartridge::loadRaw(u8 *code, u32 length)
 
 void Cartridge::dump()
 {
-  FILE *out = fopen("rom.gb","wb");
-
-  fwrite(status.rom, 32_kb, sizeof(u8), out);
-  fclose(out);
+  path out = path("rom.gb");
+  out.writeAll(status.rom, 32_kb, sizeof(u8));
 }
 
 void Cartridge::dumpSave()
@@ -474,9 +472,7 @@ void Cartridge::dumpSave()
   
   if (size > 0)
   {
-    std::string outName = status.fileName + ".sav";
-    FILE *out = fopen(outName.c_str(), "wb");
-    fwrite(status.ram, size, sizeof(u8), out);
-    fclose(out);
+    path outName = status.fileName.withExtension(".sav");
+    outName.writeAll(status.ram, sizeof(u8), size);
   }
 }

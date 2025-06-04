@@ -232,7 +232,7 @@ void scanFolder(const path& root, const std::function<void(bool, const path& pat
   }
 }
 
-std::vector<path> FileSystem::contentsOfFolder(const path& folder, bool recursive, predicate<path> exclude) const
+std::vector<path> FileSystem::contentsOfFolder(const path& folder, bool recursive, std::function<bool(path)> exclude) const
 {
   std::vector<path> result;
   

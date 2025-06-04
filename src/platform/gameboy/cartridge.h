@@ -121,11 +121,11 @@ private:
   /* initialize values (which bank selected, pointers, etc) */
   void init();
   /* load a cartridge */
-  void load(const std::string& romName);
+  void load(const path& romName);
 
 public:
   Cartridge();
-  Cartridge(const std::string& fileName);
+  Cartridge(const path& fileName);
 
   ~Cartridge();
 
