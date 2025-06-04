@@ -554,7 +554,16 @@ int main(int, char**)
       SDL_UnlockTexture(texture);
     }
 
-    ImGui::Image((ImTextureID)texture, ImVec2(256, 256));
+    ImVec2 avail = ImGui::GetContentRegionAvail();
+    float scale = std::min(avail.x / 256, avail.y / 256);
+    ImVec2 size = ImVec2(256 * scale, 256 * scale);
+
+    // Per centrare:
+    ImVec2 cursor = ImGui::GetCursorPos();
+    ImGui::SetCursorPos(ImVec2(cursor.x + (avail.x - size.x) * 0.5f,
+      cursor.y + (avail.y - size.y) * 0.5f));
+
+    ImGui::Image((ImTextureID)texture, size);
     ImGui::End();
 
     if (false)
