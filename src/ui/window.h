@@ -16,6 +16,7 @@ namespace ui
 
   public:
     Window(std::string_view title = "") : _title(title), _opened(true) { }
+    virtual ~Window() = default;
     void render();
   };
 
@@ -31,6 +32,11 @@ namespace ui
     {
       for (const auto& window : _windows)
         window->render();
+    }
+    
+    void close()
+    {
+      _windows.clear();
     }
   };
 }

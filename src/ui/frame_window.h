@@ -32,6 +32,7 @@ namespace gfx
     Pixel* data() { return _data.data(); }
 
     void fill(Pixel color);
+    void set(int x, int y, Pixel color) { pixel(x, y) = color; }
   };
 
   struct Texture

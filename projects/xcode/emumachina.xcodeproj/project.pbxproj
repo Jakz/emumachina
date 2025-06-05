@@ -20,6 +20,8 @@
 		046BD5022DEFC3C0001622CC /* rtc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD5012DEFC3C0001622CC /* rtc.cpp */; };
 		046BD5082DEFC510001622CC /* file_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD5042DEFC510001622CC /* file_system.cpp */; };
 		046BD5092DEFC510001622CC /* path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD5052DEFC510001622CC /* path.cpp */; };
+		046BD5142DF11362001622CC /* frame_window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD5102DF11362001622CC /* frame_window.cpp */; };
+		046BD5152DF11362001622CC /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD5112DF11362001622CC /* window.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -62,6 +64,11 @@
 		046BD5052DEFC510001622CC /* path.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = path.cpp; path = ../../src/base/path.cpp; sourceTree = "<group>"; };
 		046BD5062DEFC510001622CC /* path.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = path.h; path = ../../src/base/path.h; sourceTree = "<group>"; };
 		046BD5072DEFC510001622CC /* file_system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = file_system.h; path = ../../src/base/file_system.h; sourceTree = "<group>"; };
+		046BD50E2DF11354001622CC /* component.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = component.h; path = ../../src/devices/component.h; sourceTree = "<group>"; };
+		046BD5102DF11362001622CC /* frame_window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = frame_window.cpp; path = ../../src/ui/frame_window.cpp; sourceTree = "<group>"; };
+		046BD5112DF11362001622CC /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = window.cpp; path = ../../src/ui/window.cpp; sourceTree = "<group>"; };
+		046BD5122DF11362001622CC /* window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = window.h; path = ../../src/ui/window.h; sourceTree = "<group>"; };
+		046BD5132DF11362001622CC /* frame_window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = frame_window.h; path = ../../src/ui/frame_window.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -97,6 +104,8 @@
 		046BD4DD2DED2508001622CC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				046BD50F2DF11359001622CC /* ui */,
+				046BD50D2DF1134C001622CC /* devices */,
 				046BD5032DEFC505001622CC /* base */,
 				046BD4FB2DEFC352001622CC /* platform */,
 				046BD4E02DED2565001622CC /* imgui */,
@@ -166,6 +175,25 @@
 			name = base;
 			sourceTree = "<group>";
 		};
+		046BD50D2DF1134C001622CC /* devices */ = {
+			isa = PBXGroup;
+			children = (
+				046BD50E2DF11354001622CC /* component.h */,
+			);
+			name = devices;
+			sourceTree = "<group>";
+		};
+		046BD50F2DF11359001622CC /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				046BD5102DF11362001622CC /* frame_window.cpp */,
+				046BD5132DF11362001622CC /* frame_window.h */,
+				046BD5112DF11362001622CC /* window.cpp */,
+				046BD5122DF11362001622CC /* window.h */,
+			);
+			name = ui;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -225,11 +253,13 @@
 			files = (
 				046BD5022DEFC3C0001622CC /* rtc.cpp in Sources */,
 				046BD4F32DED25A0001622CC /* imgui_impl_sdl2.cpp in Sources */,
+				046BD5152DF11362001622CC /* window.cpp in Sources */,
 				046BD4EC2DED2582001622CC /* imgui_draw.cpp in Sources */,
 				046BD4DF2DED2519001622CC /* main.cpp in Sources */,
 				046BD5082DEFC510001622CC /* file_system.cpp in Sources */,
 				046BD4FF2DEFC365001622CC /* cartridge.cpp in Sources */,
 				046BD4ED2DED2582001622CC /* imgui_tables.cpp in Sources */,
+				046BD5142DF11362001622CC /* frame_window.cpp in Sources */,
 				046BD4EE2DED2582001622CC /* imgui_widgets.cpp in Sources */,
 				046BD5092DEFC510001622CC /* path.cpp in Sources */,
 				046BD4F42DED25A0001622CC /* imgui_impl_sdlrenderer2.cpp in Sources */,

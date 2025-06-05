@@ -310,7 +310,7 @@ bool Platform::init()
   SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
 #endif
 
-  return initAudio();
+  return true || initAudio();
 }
 
 Platform platform;
@@ -395,6 +395,7 @@ sounds::filters::LowPassFilter filter(4.0_khz, 44100.0f); // Low-pass filter wit
 
 void Platform::audioCallback(void* userdata, uint8_t* data, int len)
 {
+  memset(data, 0, len);
   return;
   
   float* stream = reinterpret_cast<float*>(data);
@@ -455,6 +456,7 @@ int main(int, char**)
     SDL_Log("Error creating SDL_Renderer!");
     return -1;
   }
+
   //SDL_RendererInfo info;
   //SDL_GetRendererInfo(renderer, &info);
   //SDL_Log("Current SDL_Renderer: %s", info.name);
@@ -625,6 +627,8 @@ int main(int, char**)
     ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
     SDL_RenderPresent(renderer);
   }
+  
+  gui.manager.close();
 
   // Cleanup
   ImGui_ImplSDLRenderer2_Shutdown();
@@ -635,6 +639,7 @@ int main(int, char**)
   SDL_DestroyWindow(window);
 
   platform.closeAudio();
+  
 
   SDL_Quit();
 

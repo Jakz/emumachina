@@ -50,5 +50,32 @@ void FrameWindow::doRender()
 
 void FrameWindow::update()
 {
+  _frameBuffer->fill(gfx::Pixel(0, 0, 0, 255));
+  
+  struct Star { int x; int y; int layer; };
+  static std::vector<Star> stars;
+  if (stars.empty())
+  {
+    for (size_t i = 0; i < 100; ++i)
+    {
+      stars.push_back({ rand() % _frameBuffer->width(), rand() % _frameBuffer->height(), rand() % 3 });
+    }
+  }
+  
+  /* update stars */
+  for (auto& star : stars)
+  {
+    star.x -= star.layer + 1;
+    if (star.x < 0)
+    {
+      star.x = _frameBuffer->width() - 1;
+      star.y = rand() % _frameBuffer->height();
+    }
+  }
+  
+  /* draw stars */
+  for (const auto& star : stars)
+    _frameBuffer->set(star.x, star.y, gfx::Pixel(255 - star.layer * 80, 255 - star.layer * 80, 255 - star.layer * 80, 255));
+  
   _texture.update(_frameBuffer->data());
 }
