@@ -2,31 +2,37 @@
 
 #include "imgui.h"
 
-
-#include "SDL.h"
-
-extern SDL_Renderer* renderer;
+#include "raylib.h"
+#include "rlImGui.h"
 
 void gfx::FrameBuffer::fill(Pixel color)
 {
   std::fill(_data.begin(), _data.end(), color);
 }
 
-gfx::Texture::Texture(int width, int height) : _opaque(nullptr), _width(width), _height(height)
+gfx::Texture::Texture(int width, int height) : _width(width), _height(height)
 {
-  _opaque = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, width, height);
+  /* create texture */
+  std::unique_ptr<uint8_t[]> data(new uint8_t[width * height * 4]()); // RGBA format, initialized to zero
+  Image img = {
+      .data = data.get(),
+      .width = width,
+      .height = height,
+      .mipmaps = 1,
+      .format = PIXELFORMAT_UNCOMPRESSED_R8G8B8A8
+  };
+
+  _texture = LoadTextureFromImage(img);
 }
 
 gfx::Texture::~Texture()
 {
-  if (_opaque)
-    SDL_DestroyTexture(static_cast<SDL_Texture*>(_opaque));
+  UnloadTexture(_texture);
 }
 
 void gfx::Texture::update(void* data)
 {
-  if (_opaque)
-    SDL_UpdateTexture(static_cast<SDL_Texture*>(_opaque), nullptr, data, _width * sizeof(gfx::Pixel));
+  UpdateTexture(_texture, data);
 }
 
 using namespace ui;
@@ -45,7 +51,7 @@ void FrameWindow::doRender()
   ImGui::SetCursorPos(ImVec2(cursor.x + (avail.x - size.x) * 0.5f,
     cursor.y + (avail.y - size.y) * 0.5f));
 
-  ImGui::Image((ImTextureID)_texture.opaque(), size);
+  rlImGuiImageSize(&_texture.texture(), size.x, size.y);
 }
 
 void FrameWindow::update()

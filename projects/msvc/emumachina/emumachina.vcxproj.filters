@@ -4,9 +4,6 @@
     <Filter Include="src">
       <UniqueIdentifier>{29b42430-e7f1-43a2-a858-253f5cc543e2}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\imgui">
-      <UniqueIdentifier>{7596c667-05db-4491-b4f5-e14ffc5c7908}</UniqueIdentifier>
-    </Filter>
     <Filter Include="src\base">
       <UniqueIdentifier>{c20aedc7-f426-4066-9edb-6aa028fcb459}</UniqueIdentifier>
     </Filter>
@@ -22,31 +19,34 @@
     <Filter Include="src\ui">
       <UniqueIdentifier>{2a13ecb3-fc9e-47ac-ad1c-8d94c993364d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\libs">
+      <UniqueIdentifier>{31556af4-1872-4e53-bfe0-3c2f541993dd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\libs\imgui">
+      <UniqueIdentifier>{7596c667-05db-4491-b4f5-e14ffc5c7908}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\libs\rllm">
+      <UniqueIdentifier>{b972fe8c-da04-4411-af24-f314d688565e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\libs\imgui\imgui_tables.cpp">
-      <Filter>src\imgui</Filter>
+      <Filter>src\libs\imgui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\libs\imgui\imgui_widgets.cpp">
-      <Filter>src\imgui</Filter>
+      <Filter>src\libs\imgui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\libs\imgui\imgui.cpp">
-      <Filter>src\imgui</Filter>
+      <Filter>src\libs\imgui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\libs\imgui\imgui_demo.cpp">
-      <Filter>src\imgui</Filter>
+      <Filter>src\libs\imgui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\..\libs\imgui\imgui_draw.cpp">
-      <Filter>src\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\libs\imgui\backends\imgui_impl_sdlrenderer2.cpp">
-      <Filter>src\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\..\..\libs\imgui\backends\imgui_impl_sdl2.cpp">
-      <Filter>src\imgui</Filter>
+      <Filter>src\libs\imgui</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\src\base\file_system.cpp">
       <Filter>src\base</Filter>
@@ -66,28 +66,28 @@
     <ClCompile Include="..\..\..\src\ui\frame_window.cpp">
       <Filter>src\ui</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\libs\rlImGui\rlImGui.cpp">
+      <Filter>src\libs\rllm</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\..\..\libs\imgui\imstb_rectpack.h">
-      <Filter>src\imgui</Filter>
+      <Filter>src\libs\imgui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\libs\imgui\imstb_textedit.h">
-      <Filter>src\imgui</Filter>
+      <Filter>src\libs\imgui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\libs\imgui\imstb_truetype.h">
-      <Filter>src\imgui</Filter>
+      <Filter>src\libs\imgui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\libs\imgui\imconfig.h">
-      <Filter>src\imgui</Filter>
+      <Filter>src\libs\imgui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\libs\imgui\imgui.h">
-      <Filter>src\imgui</Filter>
+      <Filter>src\libs\imgui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\..\libs\imgui\imgui_internal.h">
-      <Filter>src\imgui</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\..\..\libs\imgui\backends\imgui_impl_sdlrenderer2.h">
-      <Filter>src\imgui</Filter>
+      <Filter>src\libs\imgui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\src\common.h">
       <Filter>src</Filter>
@@ -112,6 +112,15 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\ui\frame_window.h">
       <Filter>src\ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\libs\rlImGui\rlImGui.h">
+      <Filter>src\libs\rllm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\libs\rlImGui\rlImGuiColors.h">
+      <Filter>src\libs\rllm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\libs\rlImGui\imgui_impl_raylib.h">
+      <Filter>src\libs\rllm</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

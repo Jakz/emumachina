@@ -49,13 +49,13 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Jack\Documents\dev\libs\imgui;C:\Users\Jack\Documents\dev\libs\sdl\SDL2-2.28.3\include;$(SolutionDir)..\..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jack\Documents\dev\libs\imgui;C:\Users\Jack\Documents\dev\libs\sdl\SDL2-2.28.3\include;$(SolutionDir)..\..\..\src;C:\Users\Jack\Documents\dev\libs\raylib-5.5_win64_msvc16\include;C:\Users\Jack\Documents\dev\libs\raylib-cpp\include;C:\Users\Jack\Documents\dev\libs\rlImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>C:\Users\Jack\Documents\dev\libs\sdl\SDL2-2.28.3\lib\x64\SDL2.lib;C:\Users\Jack\Documents\dev\libs\sdl\SDL2-2.28.3\lib\x64\SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Users\Jack\Documents\dev\libs\raylib-5.5_win64_msvc16\lib\raylib.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -66,7 +66,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);_CRT_SECURE_NO_WARNINGS</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Users\Jack\Documents\dev\libs\imgui;C:\Users\Jack\Documents\dev\libs\sdl\SDL2-2.28.3\include;$(SolutionDir)..\..\..\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Jack\Documents\dev\libs\imgui;C:\Users\Jack\Documents\dev\libs\sdl\SDL2-2.28.3\include;$(SolutionDir)..\..\..\src;C:\Users\Jack\Documents\dev\libs\raylib-5.5_win64_msvc16\include;C:\Users\Jack\Documents\dev\libs\raylib-cpp\include;C:\Users\Jack\Documents\dev\libs\rlImGui;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
@@ -74,17 +74,16 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>C:\Users\Jack\Documents\dev\libs\sdl\SDL2-2.28.3\lib\x64\SDL2.lib;C:\Users\Jack\Documents\dev\libs\sdl\SDL2-2.28.3\lib\x64\SDL2main.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>C:\Users\Jack\Documents\dev\libs\raylib-5.5_win64_msvc16\lib\raylib.lib;winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\libs\imgui\backends\imgui_impl_sdl2.cpp" />
-    <ClCompile Include="..\..\..\..\libs\imgui\backends\imgui_impl_sdlrenderer2.cpp" />
     <ClCompile Include="..\..\..\..\libs\imgui\imgui.cpp" />
     <ClCompile Include="..\..\..\..\libs\imgui\imgui_demo.cpp" />
     <ClCompile Include="..\..\..\..\libs\imgui\imgui_draw.cpp" />
     <ClCompile Include="..\..\..\..\libs\imgui\imgui_tables.cpp" />
     <ClCompile Include="..\..\..\..\libs\imgui\imgui_widgets.cpp" />
+    <ClCompile Include="..\..\..\..\libs\rlImGui\rlImGui.cpp" />
     <ClCompile Include="..\..\..\src\base\file_system.cpp" />
     <ClCompile Include="..\..\..\src\base\path.cpp" />
     <ClCompile Include="..\..\..\src\main.cpp" />
@@ -94,13 +93,15 @@
     <ClCompile Include="..\..\..\src\ui\window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\libs\imgui\backends\imgui_impl_sdlrenderer2.h" />
     <ClInclude Include="..\..\..\..\libs\imgui\imconfig.h" />
     <ClInclude Include="..\..\..\..\libs\imgui\imgui.h" />
     <ClInclude Include="..\..\..\..\libs\imgui\imgui_internal.h" />
     <ClInclude Include="..\..\..\..\libs\imgui\imstb_rectpack.h" />
     <ClInclude Include="..\..\..\..\libs\imgui\imstb_textedit.h" />
     <ClInclude Include="..\..\..\..\libs\imgui\imstb_truetype.h" />
+    <ClInclude Include="..\..\..\..\libs\rlImGui\imgui_impl_raylib.h" />
+    <ClInclude Include="..\..\..\..\libs\rlImGui\rlImGui.h" />
+    <ClInclude Include="..\..\..\..\libs\rlImGui\rlImGuiColors.h" />
     <ClInclude Include="..\..\..\src\base\file_system.h" />
     <ClInclude Include="..\..\..\src\base\path.h" />
     <ClInclude Include="..\..\..\src\common.h" />

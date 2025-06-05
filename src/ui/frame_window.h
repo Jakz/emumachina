@@ -2,12 +2,14 @@
 
 #include "window.h"
 
+#include "raylib.h"
+
 namespace gfx
 {
   union Pixel
   {
     uint32_t value;
-    struct { uint8_t a, b, g, r; };
+    struct { uint8_t r, g, b, a; };
 
     Pixel(uint8_t red = 0, uint8_t green = 0, uint8_t blue = 0, uint8_t alpha = 255)
       : r(red), g(green), b(blue), a(alpha) {}
@@ -38,7 +40,7 @@ namespace gfx
   {
   protected:
     int _width, _height;
-    void* _opaque;
+    Texture2D _texture;
 
   public:
     Texture(int width, int height);
@@ -46,7 +48,7 @@ namespace gfx
     ~Texture();
 
     void update(void* data);
-    void* opaque() const { return _opaque; }
+    const Texture2D& texture() const { return _texture; }
   };
 }
 

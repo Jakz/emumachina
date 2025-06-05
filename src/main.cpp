@@ -1,8 +1,9 @@
 #include "imgui.h"
-#include "backends/imgui_impl_sdl2.h"
-#include "backends/imgui_impl_sdlrenderer2.h"
+#include "raylib.hpp"
+#include "rlImGui.h"
 
-#include "SDL.h"
+#include "Vector2.hpp"
+#include "Window.hpp"
 
 #include <cmath>
 #include <cstdio>
@@ -11,6 +12,8 @@
 #include <memory>
 #include <array>
 #include <algorithm>
+
+#include "raylib.h"
 
 #include "common.h"
 #include "devices/component.h"
@@ -192,7 +195,7 @@ namespace sounds
         case Waveform::Square: return (_phase < 0.5f) ? 1.0f : -1.0f;
         case Waveform::Sawtooth: return 2.0f * _phase - 1.0f;
         case Waveform::Triangle: return (_phase < 0.5f) ? (4.0f * _phase - 1.0f) : (3.0f - 4.0f * _phase);
-        case Waveform::Sine: return std::sinf(2.0f * M_PI * _phase);
+        case Waveform::Sine: return std::sinf(2.0f * PI * _phase);
       }
 
       return 0.0f;
@@ -238,7 +241,7 @@ namespace sounds
       void updateAlpha()
       {
         float dt = 1.0f / _sampleRate;
-        float rc = 1.0f / (2.0f * M_PI * _cutoff);
+        float rc = 1.0f / (2.0f * PI * _cutoff);
         _alpha = dt / (rc + dt);
       }
 
@@ -256,7 +259,6 @@ namespace sounds
 struct Platform
 {
 protected:
-  SDL_AudioDeviceID _audioDevice;
 public:
   Platform();
 
@@ -268,48 +270,21 @@ public:
   static void audioCallback(void* userdata, uint8_t* stream, int len);
 };
 
-Platform::Platform() : _audioDevice(0) { }
+Platform::Platform() { }
 
 bool Platform::initAudio()
 {
-  SDL_AudioSpec want{}, have{};
-  want.freq = 44100;
-  want.format = AUDIO_F32SYS;
-  want.channels = 1;
-  want.samples = 512;
-  want.callback = audioCallback;
-  want.userdata = this;
-
-  _audioDevice = SDL_OpenAudioDevice(nullptr, 0, &want, &have, 0);
-  if (!_audioDevice)
-  {
-    fprintf(stderr, "Failed to open audio: %s\n", SDL_GetError());
-    return false;
-  }
-
-  SDL_PauseAudioDevice(_audioDevice, 0);
-
   return true;
 }
 
 void Platform::closeAudio()
 {
-  if (_audioDevice)
-    SDL_CloseAudioDevice(_audioDevice);
+
 }
 
 bool Platform::init()
 {
-  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER | SDL_INIT_GAMECONTROLLER | SDL_INIT_AUDIO) != 0)
-  {
-    printf("Error: %s\n", SDL_GetError());
-    return false;
-  }
-
-#ifdef SDL_HINT_IME_SHOW_UI
-  SDL_SetHint(SDL_HINT_IME_SHOW_UI, "1");
-#endif
-
+  
   return initAudio();
 }
 
@@ -429,8 +404,6 @@ void Platform::audioCallback(void* userdata, uint8_t* data, int len)
   }
 }
 
-SDL_Renderer* renderer = nullptr;
-
 // Main code
 int main(int, char**)
 {
@@ -440,203 +413,50 @@ int main(int, char**)
   
   platform.init();
 
-  // Create window with SDL_Renderer graphics context
-  SDL_WindowFlags window_flags = (SDL_WindowFlags)(SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI);
-  SDL_Window* window = SDL_CreateWindow("Dear ImGui SDL2+SDL_Renderer example", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, window_flags);
-  if (window == nullptr)
-  {
-    printf("Error: SDL_CreateWindow(): %s\n", SDL_GetError());
-    return -1;
-  }
-  
-  renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_PRESENTVSYNC | SDL_RENDERER_ACCELERATED);
-  if (renderer == nullptr)
-  {
-    SDL_Log("Error creating SDL_Renderer!");
-    return -1;
-  }
-  //SDL_RendererInfo info;
-  //SDL_GetRendererInfo(renderer, &info);
-  //SDL_Log("Current SDL_Renderer: %s", info.name);
+  SetConfigFlags(FLAG_MSAA_4X_HINT);
 
-  // Setup Dear ImGui context
-  IMGUI_CHECKVERSION();
-  ImGui::CreateContext();
-  ImGuiIO& io = ImGui::GetIO(); (void)io;
-  io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-  io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+  raylib::Window bootstrap(1, 1, "Bootstrap");
 
-  // Setup Dear ImGui style
-  ImGui::StyleColorsDark();
-  //ImGui::StyleColorsLight();
+  int monitor = GetCurrentMonitor();
+  raylib::Vector2 screenSize = raylib::Vector2(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
+  screenSize.x = std::min(screenSize.x * 0.666f, 1920.0f);
+  screenSize.y = screenSize.x * 1.0f / (16.0f / 10.0f);  // 16:9 aspect ratio
 
-  // Setup Platform/Renderer backends
-  ImGui_ImplSDL2_InitForSDLRenderer(window, renderer);
-  ImGui_ImplSDLRenderer2_Init(renderer);
+  bootstrap.Close();
 
-  // Load Fonts
-  // - If no fonts are loaded, dear imgui will use the default font. You can also load multiple fonts and use ImGui::PushFont()/PopFont() to select them.
-  // - AddFontFromFileTTF() will return the ImFont* so you can store it if you need to select the font among multiple.
-  // - If the file cannot be loaded, the function will return a nullptr. Please handle those errors in your application (e.g. use an assertion, or display an error and quit).
-  // - The fonts will be rasterized at a given size (w/ oversampling) and stored into a texture when calling ImFontAtlas::Build()/GetTexDataAsXXXX(), which ImGui_ImplXXXX_NewFrame below will call.
-  // - Use '#define IMGUI_ENABLE_FREETYPE' in your imconfig file to use Freetype for higher quality font rendering.
-  // - Read 'docs/FONTS.md' for more instructions and details.
-  // - Remember that in C/C++ if you want to include a backslash \ in a string literal you need to write a double backslash \\ !
-  //io.Fonts->AddFontDefault();
-  //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\segoeui.ttf", 18.0f);
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/DroidSans.ttf", 16.0f);
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Roboto-Medium.ttf", 16.0f);
-  //io.Fonts->AddFontFromFileTTF("../../misc/fonts/Cousine-Regular.ttf", 15.0f);
-  //ImFont* font = io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, nullptr, io.Fonts->GetGlyphRangesJapanese());
-  //IM_ASSERT(font != nullptr);
+  raylib::Window window = raylib::Window(screenSize.x, screenSize.y, "Procedurality");
 
-  ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+  Image img = GenImagePerlinNoise(256, 256, 0, 0, 10.0f);
+  Texture2D tex = LoadTextureFromImage(img);
 
-  SDL_Texture* texture = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_RGBA8888, SDL_TEXTUREACCESS_STREAMING, 256, 256);
-  
+  SetTargetFPS(60);
+  rlImGuiSetup(true);
+
   auto* frameWindow = new ui::FrameWindow("Framebuffer", 256, 256);
   frameWindow->frameBuffer()->fill(gfx::Pixel(255, 255, 0));
   gui.manager.add(frameWindow);
 
-  // Main loop
-  bool done = false;
-  while (!done)
+  while (!WindowShouldClose())
   {
-    // Poll and handle events (inputs, window resize, etc.)
-    // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
-    // - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
-    // - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
-    // Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-    SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
-      ImGui_ImplSDL2_ProcessEvent(&event);
-      if (event.type == SDL_QUIT)
-        done = true;
-      if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_CLOSE && event.window.windowID == SDL_GetWindowID(window))
-        done = true;
-    }
-    if (SDL_GetWindowFlags(window) & SDL_WINDOW_MINIMIZED)
-    {
-      SDL_Delay(10);
-      continue;
-    }
+    BeginDrawing();
+    ClearBackground(Color{ 0, 12, 31 });
 
-    // Start the Dear ImGui frame
-    ImGui_ImplSDLRenderer2_NewFrame();
-    ImGui_ImplSDL2_NewFrame();
-    ImGui::NewFrame();
-
-    if (false)
-    {
-      
-      ImGui::Begin("RAM Viewer", nullptr);
-
-      const int cols = 16;
-      size_t ram_size = 0x10000;
-      static uint8_t* ram = nullptr;
-      const int total_lines = ram_size / cols;
-      
-      /* init ram to random values */
-      static bool inited = false;
-
-      if (!inited)
-      {
-        ram = new uint8_t[0x10000];
-        for (size_t i = 0; i < ram_size; ++i) {
-          ram[i] = static_cast<uint8_t>(rand() % 256);
-        }
-        inited = true;
-      }
-
-      if (ImGui::BeginTable("ramtable", cols + 2, ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg)) {
-        ImGuiListClipper clipper;
-        clipper.Begin(total_lines);
-
-        ImGui::TableSetupColumn("address", ImGuiTableColumnFlags_WidthFixed, 60.0f);
-        for (int col = 0; col < cols; ++col)
-          ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 22.0f);
-        ImGui::TableSetupColumn("ascii", ImGuiTableColumnFlags_WidthFixed, 120.0f);
-
-        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
-        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
-        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0.0f, 1.0f));
-        ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
-
-        while (clipper.Step())
-        {
-          for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row)
-          {
-            ImGui::TableNextRow();
-            ImGui::TableSetColumnIndex(0);
-            ImGui::Text("%04Xh", row * cols);
-
-            std::string ascii;
-
-            for (int col = 0; col < cols; ++col)
-            {
-              size_t index = row * cols + col;
-              ImGui::TableSetColumnIndex(1 + col);
-              /* ImGui::Text("%02X", ram[index]); */
-
-              char buf[3];
-              snprintf(buf, sizeof(buf), "%02X", ram[index]);
-
-              ImGui::PushID(index);
-              if (ImGui::InputText("##hex", buf, sizeof(buf),
-                ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysOverwrite | ImGuiInputTextFlags_NoHorizontalScroll)) {
-
-                // This block runs only when the user confirms the change
-                unsigned int val;
-                if (sscanf(buf, "%02X", &val) == 1)
-                {
-                  ram[index] = static_cast<uint8_t>(val);
-                }
-              }
-              ImGui::PopID();
-
-              ascii += std::isprint(ram[index]) ? char(ram[index]) : '.';
-            }
-
-            ImGui::TableSetColumnIndex(cols + 1);
-            ImGui::TextUnformatted(ascii.c_str());
-          }
-        }
-
-        ImGui::PopStyleVar(3);
-        ImGui::PopStyleColor(1);
-
-        ImGui::EndTable();
-      }
-
-
-      ImGui::End();
-    }
+    rlImGuiBegin();
 
     gui.windows.waveGenerator.render();
 
     gui.manager.render();
 
-    // Rendering
-    ImGui::Render();
-    SDL_RenderSetScale(renderer, io.DisplayFramebufferScale.x, io.DisplayFramebufferScale.y);
-    SDL_SetRenderDrawColor(renderer, (Uint8)(clear_color.x * 255), (Uint8)(clear_color.y * 255), (Uint8)(clear_color.z * 255), (Uint8)(clear_color.w * 255));
-    SDL_RenderClear(renderer);
-    ImGui_ImplSDLRenderer2_RenderDrawData(ImGui::GetDrawData(), renderer);
-    SDL_RenderPresent(renderer);
+    rlImGuiEnd();
+
+    EndDrawing();
   }
 
-  // Cleanup
-  ImGui_ImplSDLRenderer2_Shutdown();
-  ImGui_ImplSDL2_Shutdown();
-  ImGui::DestroyContext();
-
-  SDL_DestroyRenderer(renderer);
-  SDL_DestroyWindow(window);
 
   platform.closeAudio();
 
-  SDL_Quit();
+  rlImGuiShutdown();
+  CloseWindow();
 
   return 0;
 }
