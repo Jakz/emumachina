@@ -513,6 +513,93 @@ int main(int, char**)
       gui.manager.add(frameWindow);
     }
 
+
+    if (false)
+    {
+
+      ImGui::Begin("RAM Viewer", nullptr);
+
+      const int cols = 16;
+      size_t ram_size = 0x10000;
+      static uint8_t* ram = nullptr;
+      const int total_lines = ram_size / cols;
+
+      /* init ram to random values */
+      static bool inited = false;
+
+      if (!inited)
+      {
+        ram = new uint8_t[0x10000];
+        for (size_t i = 0; i < ram_size; ++i) {
+          ram[i] = static_cast<uint8_t>(rand() % 256);
+        }
+        inited = true;
+      }
+
+      if (ImGui::BeginTable("ramtable", cols + 2, ImGuiTableFlags_ScrollY | ImGuiTableFlags_RowBg)) {
+        ImGuiListClipper clipper;
+        clipper.Begin(total_lines);
+
+        ImGui::TableSetupColumn("address", ImGuiTableColumnFlags_WidthFixed, 60.0f);
+        for (int col = 0; col < cols; ++col)
+          ImGui::TableSetupColumn("", ImGuiTableColumnFlags_WidthFixed, 22.0f);
+        ImGui::TableSetupColumn("ascii", ImGuiTableColumnFlags_WidthFixed, 120.0f);
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
+        ImGui::PushStyleVar(ImGuiStyleVar_CellPadding, ImVec2(0.0f, 1.0f));
+        ImGui::PushStyleColor(ImGuiCol_FrameBg, IM_COL32(0, 0, 0, 0));
+
+        while (clipper.Step())
+        {
+          for (int row = clipper.DisplayStart; row < clipper.DisplayEnd; ++row)
+          {
+            ImGui::TableNextRow();
+            ImGui::TableSetColumnIndex(0);
+            ImGui::Text("%04Xh", row * cols);
+
+            std::string ascii;
+
+            for (int col = 0; col < cols; ++col)
+            {
+              size_t index = row * cols + col;
+              ImGui::TableSetColumnIndex(1 + col);
+              /* ImGui::Text("%02X", ram[index]); */
+
+              char buf[3];
+              snprintf(buf, sizeof(buf), "%02X", ram[index]);
+
+              ImGui::PushID(index);
+              if (ImGui::InputText("##hex", buf, sizeof(buf),
+                ImGuiInputTextFlags_CharsHexadecimal | ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_AlwaysOverwrite | ImGuiInputTextFlags_NoHorizontalScroll)) {
+
+                // This block runs only when the user confirms the change
+                unsigned int val;
+                if (sscanf(buf, "%02X", &val) == 1)
+                {
+                  ram[index] = static_cast<uint8_t>(val);
+                }
+              }
+              ImGui::PopID();
+
+              ascii += std::isprint(ram[index]) ? char(ram[index]) : '.';
+            }
+
+            ImGui::TableSetColumnIndex(cols + 1);
+            ImGui::TextUnformatted(ascii.c_str());
+          }
+        }
+
+        ImGui::PopStyleVar(3);
+        ImGui::PopStyleColor(1);
+
+        ImGui::EndTable();
+      }
+
+
+      ImGui::End();
+    }
+
     rlImGuiEnd();
 
     EndDrawing();
