@@ -70,6 +70,6 @@ namespace ui
     gfx::FrameBuffer* frameBuffer() { return _frameBuffer.get(); }
     const gfx::FrameBuffer* frameBuffer() const { return _frameBuffer.get(); }
 
-    void update();
+    virtual void update();
   };
 }

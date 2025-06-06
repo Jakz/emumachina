@@ -259,6 +259,8 @@ namespace sounds
 struct Platform
 {
 protected:
+  AudioStream _audio;
+
 public:
   Platform();
 
@@ -267,19 +269,25 @@ public:
 
   bool init();
 
-  static void audioCallback(void* userdata, uint8_t* stream, int len);
+  static void audioCallback(void* stream, uint32_t len);
 };
 
 Platform::Platform() { }
 
 bool Platform::initAudio()
 {
+  InitAudioDevice();
+
+  _audio = LoadAudioStream(44100, 32, 1);
+  SetAudioStreamCallback(_audio, audioCallback);
+  PlayAudioStream(_audio);
+
   return true;
 }
 
 void Platform::closeAudio()
 {
-
+  CloseAudioDevice();
 }
 
 bool Platform::init()
@@ -368,12 +376,10 @@ ui::UI gui;
 structures::RingBuffer<float, 1024 * 1024> buffer;
 sounds::filters::LowPassFilter filter(4.0_khz, 44100.0f); // Low-pass filter with 1kHz cutoff
 
-void Platform::audioCallback(void* userdata, uint8_t* data, int len)
-{
+void Platform::audioCallback(void* data, uint32_t len)
+{  
   return;
-  
   float* stream = reinterpret_cast<float*>(data);
-  len /= sizeof(float);
 
   float downsampleRatio = gui.windows.waveGenerator.clock() / 44100.0f;
   const size_t requiredSamples = static_cast<size_t>(len * downsampleRatio) + 1;
@@ -404,11 +410,64 @@ void Platform::audioCallback(void* userdata, uint8_t* data, int len)
   }
 }
 
+class StarfieldWindow : public ui::FrameWindow
+{
+protected:
+  struct Star { float x, y; int layer; };
+  std::vector<Star> _stars;
+
+public:
+  StarfieldWindow(std::string_view title = "starfield") : ui::FrameWindow(title, 256, 256)
+  {
+    /* generate 100 stars with random position and layer beween 0 and 2 */
+    _stars.reserve(100);
+    for (int i = 0; i < 100; ++i)
+    {
+      Star star;
+      star.x = static_cast<float>(GetRandomValue(0, 255));
+      star.y = static_cast<float>(GetRandomValue(0, 255));
+      star.layer = GetRandomValue(0, 2);
+      _stars.push_back(star);
+    }
+  }
+
+  void update() override
+  {
+    _frameBuffer->fill(gfx::Pixel(0, 0, 0, 255));
+
+    for (const auto& star : _stars)
+    {
+      gfx::Pixel color;
+      switch (star.layer)
+      {
+        case 0: color = gfx::Pixel(255, 255, 255); break; // Foreground
+        case 1: color = gfx::Pixel(200, 200, 200); break; // Midground
+        case 2: color = gfx::Pixel(100, 100, 100); break; // Background
+      }
+      _frameBuffer->pixel(static_cast<int>(star.x), static_cast<int>(star.y)) = color;
+    }
+
+    /* update according to speed */
+    for (auto& star : _stars)
+    {
+      star.x += 0.1f * (star.layer + 1); // Speed based on layer
+      if (star.x >= _frameBuffer->width())
+      {
+        star.x -= _frameBuffer->width();
+        star.y = GetRandomValue(0, _frameBuffer->height() - 1);
+      }
+    }
+
+    FrameWindow::update();
+  }
+
+};
+
 // Main code
 int main(int, char**)
 {
   devices::Machine machine;
-  auto* ram = machine.add<devices::Ram>(0x10000); // 64KB RAM
+  auto* ram = machine.add<devices::Ram>(64_kb);
   machine.bus().map(ram, 0x0000, 0xFFFF);
   
   platform.init();
@@ -420,7 +479,7 @@ int main(int, char**)
   int monitor = GetCurrentMonitor();
   raylib::Vector2 screenSize = raylib::Vector2(GetMonitorWidth(monitor), GetMonitorHeight(monitor));
   screenSize.x = std::min(screenSize.x * 0.666f, 1920.0f);
-  screenSize.y = screenSize.x * 1.0f / (16.0f / 10.0f);  // 16:9 aspect ratio
+  screenSize.y = screenSize.x * 1.0f / (16.0f / 10.0f);
 
   bootstrap.Close();
 
@@ -432,8 +491,8 @@ int main(int, char**)
   SetTargetFPS(60);
   rlImGuiSetup(true);
 
-  auto* frameWindow = new ui::FrameWindow("Framebuffer", 256, 256);
-  frameWindow->frameBuffer()->fill(gfx::Pixel(255, 255, 0));
+  auto* frameWindow = new StarfieldWindow();
+  frameWindow->update();
   gui.manager.add(frameWindow);
 
   while (!WindowShouldClose())
@@ -446,6 +505,13 @@ int main(int, char**)
     gui.windows.waveGenerator.render();
 
     gui.manager.render();
+
+    if (IsKeyPressed(KEY_SPACE))
+    {
+      auto* frameWindow = new StarfieldWindow(std::string("starfield ") + std::to_string(rand() %1024));
+      frameWindow->update();
+      gui.manager.add(frameWindow);
+    }
 
     rlImGuiEnd();
 
