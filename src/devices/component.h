@@ -12,14 +12,21 @@ namespace devices
     virtual std::string name() const { return ""; }
   };
 
-  struct Memory
+  struct Addressable
   {
-    virtual ~Memory() = default;
-    virtual uint8_t read(addr_t address) const = 0;
-    virtual void write(addr_t address, uint8_t value) = 0;
+    virtual ~Addressable() = default;
+
+    /* read with side effects */
+    virtual uint8_t read(addr_t address) const { return peek(address); }
+    /* write with side effects */
+    virtual void write(addr_t address, uint8_t value) { return poke(address, value); }
+    /* read without side effects */
+    virtual uint8_t peek(addr_t address) const = 0;
+    /* write without side effects */
+    virtual void poke(addr_t address, uint8_t value) = 0;
   };
 
-  struct Rom : public Memory, public Component
+  struct Rom : public Addressable, public Component
   {
   protected:
     std::vector<uint8_t> _data;
@@ -27,14 +34,14 @@ namespace devices
   public:
     Rom(size_t size) : _data(size, 0) {}
 
-    uint8_t read(addr_t address) const override
+    uint8_t peek(addr_t address) const override
     {
       if (address < _data.size())
         return _data[address];
       return 0xFF;
     }
 
-    virtual void write(addr_t, uint8_t) override
+    virtual void poke(addr_t, uint8_t) override
     {
       /* ROMs are typically read - only, so we ignore writes. */
     }
@@ -46,7 +53,7 @@ namespace devices
     }
   };
 
-  struct Ram : public Memory, public Component
+  struct Ram : public Addressable, public Component
   {
   protected:
     std::vector<uint8_t> _data;
@@ -54,14 +61,14 @@ namespace devices
   public:
     Ram(size_t size) : _data(size, 0) {}
 
-    uint8_t read(addr_t address) const override
+    uint8_t peek(addr_t address) const override
     {
       if (address < _data.size())
         return _data[address];
       return 0xFF;
     }
 
-    void write(addr_t address, uint8_t value) override
+    void poke(addr_t address, uint8_t value) override
     {
       if (address < _data.size())
         _data[address] = value;
@@ -81,13 +88,13 @@ namespace devices
     struct BusMapping
     {
       addr_t start, end;
-      Memory* device;
+      Addressable* device;
     };
 
     std::vector<BusMapping> _mappings;
 
   public:
-    void map(Memory* device, addr_t start, addr_t end)
+    void map(Addressable* device, addr_t start, addr_t end)
     {
       assert(end > start);
       _mappings.push_back({ start, end, device });
@@ -110,6 +117,28 @@ namespace devices
         if (address >= mapping.start && address <= mapping.end)
         {
           mapping.device->write(address - mapping.start, value);
+          return;
+        }
+      }
+    }
+
+    uint8_t peek(addr_t address) const
+    {
+      for (const auto& mapping : _mappings)
+      {
+        if (address >= mapping.start && address <= mapping.end)
+          return mapping.device->peek(address - mapping.start);
+      }
+      return 0xFF;
+    }
+
+    void poke(addr_t address, uint8_t value)
+    {
+      for (const auto& mapping : _mappings)
+      {
+        if (address >= mapping.start && address <= mapping.end)
+        {
+          mapping.device->poke(address - mapping.start, value);
           return;
         }
       }
