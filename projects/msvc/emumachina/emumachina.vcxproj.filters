@@ -28,6 +28,9 @@
     <Filter Include="src\libs\rllm">
       <UniqueIdentifier>{b972fe8c-da04-4411-af24-f314d688565e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\platform\mos">
+      <UniqueIdentifier>{fb4538ff-c0da-4373-a2f1-005e2e7857a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">
@@ -68,6 +71,24 @@
     </ClCompile>
     <ClCompile Include="..\..\..\..\libs\rlImGui\rlImGui.cpp">
       <Filter>src\libs\rllm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\mos\mos6502.cpp">
+      <Filter>src\platform\mos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\mos\mos6502_opcodes.cpp">
+      <Filter>src\platform\mos</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\lr35902.cpp">
+      <Filter>src\platform\gameboy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\gameboy_ppu.cpp">
+      <Filter>src\platform\gameboy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\gameboy.cpp">
+      <Filter>src\platform\gameboy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\gameboy_memory.cpp">
+      <Filter>src\platform\gameboy</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -121,6 +142,27 @@
     </ClInclude>
     <ClInclude Include="..\..\..\..\libs\rlImGui\imgui_impl_raylib.h">
       <Filter>src\libs\rllm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\mos\mos6502.h">
+      <Filter>src\platform\mos</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\mos\mos6502_opcodes.h">
+      <Filter>src\platform\mos</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\gameboy_spec.h">
+      <Filter>src\platform\gameboy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\lr35902.h">
+      <Filter>src\platform\gameboy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\gameboy_ppu.h">
+      <Filter>src\platform\gameboy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\gameboy.h">
+      <Filter>src\platform\gameboy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\gameboy_memory.h">
+      <Filter>src\platform\gameboy</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -88,7 +88,13 @@
     <ClCompile Include="..\..\..\src\base\path.cpp" />
     <ClCompile Include="..\..\..\src\main.cpp" />
     <ClCompile Include="..\..\..\src\platform\gameboy\cartridge.cpp" />
+    <ClCompile Include="..\..\..\src\platform\gameboy\gameboy.cpp" />
+    <ClCompile Include="..\..\..\src\platform\gameboy\gameboy_memory.cpp" />
+    <ClCompile Include="..\..\..\src\platform\gameboy\gameboy_ppu.cpp" />
+    <ClCompile Include="..\..\..\src\platform\gameboy\lr35902.cpp" />
     <ClCompile Include="..\..\..\src\platform\gameboy\rtc.cpp" />
+    <ClCompile Include="..\..\..\src\platform\mos\mos6502.cpp" />
+    <ClCompile Include="..\..\..\src\platform\mos\mos6502_opcodes.cpp" />
     <ClCompile Include="..\..\..\src\ui\frame_window.cpp" />
     <ClCompile Include="..\..\..\src\ui\window.cpp" />
   </ItemGroup>
@@ -107,7 +113,14 @@
     <ClInclude Include="..\..\..\src\common.h" />
     <ClInclude Include="..\..\..\src\devices\component.h" />
     <ClInclude Include="..\..\..\src\platform\gameboy\cartridge.h" />
+    <ClInclude Include="..\..\..\src\platform\gameboy\gameboy.h" />
+    <ClInclude Include="..\..\..\src\platform\gameboy\gameboy_memory.h" />
+    <ClInclude Include="..\..\..\src\platform\gameboy\gameboy_ppu.h" />
+    <ClInclude Include="..\..\..\src\platform\gameboy\gameboy_spec.h" />
+    <ClInclude Include="..\..\..\src\platform\gameboy\lr35902.h" />
     <ClInclude Include="..\..\..\src\platform\gameboy\rtc.h" />
+    <ClInclude Include="..\..\..\src\platform\mos\mos6502.h" />
+    <ClInclude Include="..\..\..\src\platform\mos\mos6502_opcodes.h" />
     <ClInclude Include="..\..\..\src\ui\frame_window.h" />
     <ClInclude Include="..\..\..\src\ui\window.h" />
   </ItemGroup>

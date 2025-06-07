@@ -15,3 +15,26 @@ constexpr float operator"" _khz(long double val) { return static_cast<float>(val
 constexpr float operator"" _hz(long double val) { return static_cast<float>(val); }
 
 constexpr uint32_t operator"" _kb(unsigned long long val) { return val * 1024; }
+
+namespace bit
+{
+  static inline bool bit(u8 value, u8 bit)
+  {
+    return value & (1 << bit);
+  }
+
+  static inline u8 set(u8 value, u8 bit)
+  {
+    return value | (1 << bit);
+  }
+
+  static inline u8 res(u8 value, u8 bit)
+  {
+    return value & ~(1 << bit);
+  }
+}
+
+namespace devices
+{
+  struct Bus;
+}
