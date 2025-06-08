@@ -56,7 +56,7 @@ namespace gb
 
   public:
 
-    GpuGB(devices::Bus* bus, Gameboy* system, const EmuSpec& spec);
+    GpuGB(devices::Bus* bus, Gameboy* system);
     ~GpuGB();
     void setBuffer(pixel_t* buffer) { this->buffer = buffer; }
 

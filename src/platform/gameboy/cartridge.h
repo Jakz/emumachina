@@ -8,6 +8,7 @@
 #include <string>
 
 #include "common.h"
+#include "devices/component.h"
 #include "base/path.h"
 #include "rtc.h"
 
@@ -107,7 +108,7 @@ struct GB_CART_STATUS
   path fileName;
 };
 
-class Cartridge
+class Cartridge : public devices::Addressable
 {
 private:
   GB_CART_HEADER header;
@@ -115,9 +116,9 @@ private:
 
   u32 romSize();
   u32 ramSize();
-  
+
   RTC rtc;
-  
+
   /* initialize values (which bank selected, pointers, etc) */
   void init();
   /* load a cartridge */
@@ -134,10 +135,10 @@ public:
   bool isCGB() const { return (status.flags & MBC_CGB) != 0; }
 
   /* write value to cart address */
-  void write(u16 address, u8 value);
+  void write(u16 address, u8 value) override;
 
   /* read value at cart address */
-  u8 read(u16 address) const;
+  u8 peek(u16 address) const override;
 
   void loadRaw(u8 *code, u32 length);
 

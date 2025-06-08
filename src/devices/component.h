@@ -8,6 +8,7 @@
 namespace devices
 {
   using addr_t = uint16_t;
+  using data_t = uint8_t;
 
   struct Component
   {
@@ -20,13 +21,13 @@ namespace devices
     virtual ~Addressable() = default;
 
     /* read with side effects */
-    virtual uint8_t read(addr_t address) const { return peek(address); }
+    virtual uint8_t read(addr_t address) { return peek(address); }
     /* write with side effects */
     virtual void write(addr_t address, uint8_t value) { return poke(address, value); }
     /* read without side effects */
-    virtual uint8_t peek(addr_t address) const = 0;
+    virtual uint8_t peek(addr_t address) const { return 0; }
     /* write without side effects */
-    virtual void poke(addr_t address, uint8_t value) = 0;
+    virtual void poke(addr_t address, uint8_t value) { }
   };
 
   struct Rom : public Addressable, public Component
@@ -64,17 +65,45 @@ namespace devices
   public:
     Ram(size_t size) : _data(size, 0) {}
 
+    data_t operator[](addr_t address) const
+    {
+      return _data[address];
+    }
+
+    data_t peek(addr_t address) const override
+    {
+      return _data[address];
+    }
+
+    void poke(addr_t address, data_t value) override
+    {
+      _data[address] = value;
+    }
+  };
+
+  struct AddressableBank : public Addressable, public Component
+  {
+  protected:
+    Addressable* _memory;
+    size_t _bankSize;
+    addr_t _startAddress;
+
+    size_t _bank;
+
+  public:
+    AddressableBank(Addressable* memory, size_t bankSize, addr_t startAddress = 0x0000, size_t initialBank = 0)
+      : _memory(memory), _bankSize(bankSize), _startAddress(startAddress), _bank(initialBank) { };
+
+    void setBank(size_t bank) { _bank = bank; }
+
     uint8_t peek(addr_t address) const override
     {
-      if (address < _data.size())
-        return _data[address];
-      return 0xFF;
+      return _memory->peek(_startAddress + _bank * _bankSize + address);
     }
 
     void poke(addr_t address, uint8_t value) override
     {
-      if (address < _data.size())
-        _data[address] = value;
+      _memory->poke(_startAddress + _bank * _bankSize + address, value);
     }
   };
 

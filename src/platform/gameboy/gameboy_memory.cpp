@@ -14,26 +14,6 @@ Memory::Memory() : emu(nullptr)
 /* dealloca tutto e rialloca nuova fiammante memoria */
 void Memory::init()
 {
-	/*free(memory.vram_bank);
-   free(memory.wram_bank_0);
-   free(memory.wram_bank_1);
-   free(memory.oam_table);
-   
-   
-   memory.vram_bank = NULL;
-   memory.wram_bank_0 = NULL;
-   memory.wram_bank_1 = NULL;
-   memory.oam_table = NULL;
-   */
-  
-  memory.vram = new u8[16_kb];
-  memory.vram_bank = memory.vram;
-  
-  memset(memory.vram, 0, 16_kb);
-  
-  memory.wram = new u8[32_kb];
-  memory.wram_bank_0 = memory.wram;
-  memory.wram_bank_1 = &memory.wram[4_kb];
   
 	memory.oam_table = new u8[160];
   
@@ -44,8 +24,6 @@ void Memory::init()
   memory.cgbPaletteAutoIncr[0] = false;
   memory.cgbPaletteAutoIncr[1] = false;
   
-  memset(memory.vram, 0, 16_kb);
-  memset(memory.wram, 0, 32_kb);
   memset(memory.oam_table, 0, 160);
   memset(memory.ports_table, 0, 256);
   memset(memory.color_palette_ram, 0, 128);
@@ -54,8 +32,6 @@ void Memory::init()
 
 Memory::~Memory()
 {
-  delete [] memory.vram;
-  delete [] memory.wram;
   delete [] memory.oam_table;
   delete [] memory.ports_table;
   delete [] memory.color_palette_ram;
@@ -83,23 +59,8 @@ u8 Memory::readVram1(u16 address)
 
 u8 Memory::read(u16 address)
 {
-	/* if address is for the ROM or ext RAM just forward it to the cartridge manager */
-	if (address <= 0x7FFF || (address >= 0xA000 && address <= 0xBFFF))
-		return cart->read(address);
-  /* vram (switchable 0-1 CGB) */
-  else if (address >= 0x8000 && address <= 0x9FFF)
-    return memory.vram_bank[address - 0x8000];
-	/* wram bank 0 */
-	else if (address >= 0xC000 && address <= 0xCFFF)
-		return memory.wram_bank_0[address - 0xC000];
-	/* wram bank 1 (switchable 1-7 in CGB) */
-	else if (address >= 0xD000 && address <= 0xDFFF)
-		return memory.wram_bank_1[address - 0xD000];
-	/* mirror working ram banco 0 */
-	else if (address >= 0xE000 && address <= 0xFDFF)
-		return memory.wram_bank_0[address - 0xE000];
   // oam table
-  else if (address >= 0xFE00 && address <= 0xFE9F)
+  if (address >= 0xFE00 && address <= 0xFE9F)
     return memory.oam_table[address - 0xFE00];
   // not usable
   else if (address >= 0xFEA0 && address <= 0xFEFF)
@@ -114,23 +75,8 @@ u8 Memory::read(u16 address)
 
 void Memory::write(u16 address, u8 value)
 {
-	/* if address is for the ROM or ext RAM just forward it to the cartridge manager */
-	if (address <= 0x7FFF || (address >= 0xA000 && address <= 0xBFFF))
-		cart->write(address, value);
-  /* vram */
-  else if (address >= 0x8000 && address <= 0x9FFF)
-    memory.vram_bank[address - 0x8000] = value;
-	/* wram bank 0 */
-	else if (address >= 0xC000 && address <= 0xCFFF)	
-		memory.wram_bank_0[address - 0xC000] = value;
-	/* wram bank 1 */
-	else if (address >= 0xD000 && address <= 0xDFFF)
-		memory.wram_bank_1[address - 0xD000] = value;
-	/* mirror wram bank 0 */
-	else if (address >= 0xE000 && address <= 0xFDFF)	
-		memory.wram_bank_0[address - 0xE000] = value;
   // oam table
-  else if (address >= 0xFE00 && address <= 0xFE9F)
+  if (address >= 0xFE00 && address <= 0xFE9F)
     memory.oam_table[address - 0xFE00] = value;
   // ports + HRAM
   else if (address >= 0xFF00)
@@ -162,9 +108,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
 {
   if (address >= PORT_NR10 && address <= 0xFF3F)
   {
-#ifndef DEBUGGER
     emu->sound.write(address, value);
-#endif
   }
   
   switch (address)
@@ -199,9 +143,9 @@ void Memory::trapPortWrite(u16 address, u8 value)
     case PORT_VBK:
     {      
       if (bit::bit(value, 0))
-        memory.vram_bank = &memory.vram[8_kb];
+        memory.vramBank.setBank(1);
       else if (!bit::bit(value, 0))
-        memory.vram_bank = memory.vram;
+        memory.vramBank.setBank(0);
       
       break;
     }
@@ -210,9 +154,9 @@ void Memory::trapPortWrite(u16 address, u8 value)
     {
       u8 bank = value & 0x07;
       if (bank == 0) bank = 1;
-      
-      memory.wram_bank_1 = &memory.wram[bank * 4_kb];
-      
+
+      memory.wramBank1.setBank(bank);
+
       break;
     }
     case PORT_KEY1:
@@ -373,9 +317,7 @@ u8 Memory::rawPortRead(u16 address) const
 {
   if (address >= 0xFF10 && address <= 0xFF3F)
   {
-#ifndef DEBUGGER
     return emu->sound.read(address);
-#endif
   }
 
   return memory.ports_table[address - 0xFF00];

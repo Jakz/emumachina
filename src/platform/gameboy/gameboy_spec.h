@@ -116,9 +116,4 @@ namespace gb
     VKEY_SELECT = 6,
     VKEY_START = 7
   };
-
-  struct EmuSpec {
-    u32 displayWidth;
-    u32 displayHeight;
-  };
 }

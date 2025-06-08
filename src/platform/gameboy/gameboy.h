@@ -1,94 +1,90 @@
-#ifndef _GB_EMULATOR_H_
-#define _GB_EMULATOR_H_
+#pragma once
 
-#include "utils.h"
+#include "common.h"
 
-#include "systems/gb/gpu.h"
-#ifndef DEBUGGER
-#include "sound.h"
-#endif
-
+#include "devices/component.h"
 #include "lr35902.h"
+#include "gameboy_memory.h"
 
-namespace gb {
-
-class GpuGB;
-
-class GBSound;
-class Memory;
-class Mos6502;
-
-enum Mode
+namespace gb
 {
-  MODE_CGB = 0,
-  MODE_GB = 1,
-  MODE_CGB_IN_GB = 2
-};
+  class GpuGB;
+  class GBSound;
+  class Memory;
+  class Mos6502;
+  class Cartridge;
+  enum Key;
 
-class Gameboy
-{
-public:
+  enum Mode
+  {
+    MODE_CGB = 0,
+    MODE_GB = 1,
+    MODE_CGB_IN_GB = 2
+  };
 
-private:
-  s32 dividerCounter;
-  s32 timerCounter;
+  class Gameboy
+  {
+  public:
 
-  s32 cyclesLeft;
+  private:
+    devices::Bus _bus;
 
-  u8 keysState;
+    s32 dividerCounter;
+    s32 timerCounter;
 
-  bool isTimerEnabled();
-  void updateTimers(u16 cycles);
-  void timerTrigger();
+    s32 cyclesLeft;
 
-  bool doubleSpeed;
-  bool lcdChangedState;
+    u8 keysState;
 
-public:
-  Gameboy(const EmuSpec& spec);
+    bool isTimerEnabled();
+    void updateTimers(u16 cycles);
+    void timerTrigger();
 
-  void init();
+    bool doubleSpeed;
+    bool lcdChangedState;
 
-  void loadCartridge(const std::string& fileName);
+  public:
+    Gameboy();
 
-  void setupSound(int sampleRate);
+    void init();
 
+    void loadCartridge(const std::string& fileName);
 
-  void resetTimerCounter();
-  void resetDivCounter();
-  u32 timerTicks();
-
-
-  u8 step();
-  bool run(u32 cycles);
-
-  void requestInterrupt(Interrupt interrupt);
-
-  u64 cycles;
-  Mode mode;
-
-  static constexpr u32 timerFrequencies[4] = { 4_kb, 256_kb, 64_kb, 16_kb };
-
-  void keyPressed(Key key);
-  void keyReleased(Key key);
-  u8 keyPadState(u8 writeValue) const;
+    void setupSound(int sampleRate);
 
 
-  gb::LR35902 cpu;
-  Memory mem;
-  GpuGB* display;
-#ifndef DEBUGGER
-  GBSound sound;
-#endif
+    void resetTimerCounter();
+    void resetDivCounter();
+    u32 timerTicks();
 
-  void toggleLcdState() { lcdChangedState = true; }
-  void toggleDoubleSpeed(bool value);
 
-  void mute(bool toggle) { sound.mute(toggle); };
+    u8 step();
+    bool run(u32 cycles);
 
-  EmuSpec spec;
-};
-  
+    void requestInterrupt(Interrupt interrupt);
+
+    u64 cycles;
+    Mode mode;
+
+    static constexpr u32 timerFrequencies[4] = { 4_kb, 256_kb, 64_kb, 16_kb };
+
+    void keyPressed(Key key);
+    void keyReleased(Key key);
+    u8 keyPadState(u8 writeValue) const;
+
+
+    gb::LR35902 cpu;
+    Memory mem;
+
+    std::unique_ptr<Cartridge> _cart;
+    GpuGB* display;
+    GBSound* apu;
+
+    void toggleLcdState() { lcdChangedState = true; }
+    void toggleDoubleSpeed(bool value);
+
+    void mute(bool toggle);
+
+    EmuSpec spec;
+  };
 }
-
-#endif

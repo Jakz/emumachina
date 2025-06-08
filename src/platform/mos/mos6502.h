@@ -26,15 +26,6 @@ namespace mos6502
   class Memory;
   class Emulator;
 
-  enum Interrupt
-  {
-    INT_VBLANK = 0,
-    INT_STAT = 1,
-    INT_TIMER = 2,
-    INT_SERIAL = 3,
-    INT_JOYPAD = 4
-  };
-
   /* registers */
   struct Registers
   {
@@ -114,7 +105,7 @@ namespace mos6502
   protected:
     void resetFlag(u8 flag);
     void setFlag(u8 flag, u8 value);
-    bool isFlagSet(u8 flag);
+    bool isFlagSet(u8 flag) const;
     
     void add(u8 value);
     void sub(u8 value);

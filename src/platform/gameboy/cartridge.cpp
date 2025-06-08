@@ -225,7 +225,7 @@ void Cartridge::write(u16 address, u8 value)
 }
 
 // reads a byte from rom
-u8 Cartridge::read(u16 address) const
+u8 Cartridge::peek(u16 address) const
 {
   // first 16kb -> rom_bank_0
   if (address <= 0x3FFF)

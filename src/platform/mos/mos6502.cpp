@@ -180,6 +180,7 @@ bool Mos6502::manageInterrupts()
     // if there is at least one interrupt to handle
     if (ifreg)
     {
+      //TODO: checking only 5 bits for GB but real 6502 could be different
       for (int i = 0; i < 5; ++i)
       {
         // if the ith interrupt is both set and enabled
@@ -207,7 +208,7 @@ bool Mos6502::manageInterrupts()
   return false;
 }
 
-inline bool Mos6502::isFlagSet(u8 flag)
+inline bool Mos6502::isFlagSet(u8 flag) const
 {
   return r.F & flag;
 }

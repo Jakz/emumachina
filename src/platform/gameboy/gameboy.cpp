@@ -3,28 +3,37 @@
 #include "platform/mos/mos6502_opcodes.h"
 
 #include "gameboy_ppu.h"
+#include "gameboy_apu.h"
 #include "cartridge.h"
+
 
 using namespace gb;
 
 constexpr u32 Gameboy::timerFrequencies[4];
 
-Gameboy::Gameboy(const EmuSpec& spec) : mem(), cpu(LR35902(*this)), spec(spec)
-#ifndef DEBUGGER
-, sound(GBSound())
-#endif
+Gameboy::Gameboy() : mem(), cpu(LR35902(*this)), spec(spec), apu(new GBSound()), _cart(new Cartridge())
 {
   this->timerCounter = 1024;
   this->cycles = 0;
   this->mode = MODE_GB;
   
-  this->display = new GpuGB(mem, *this, spec);
+  this->display = new GpuGB(&_bus, this, spec);
   
   keysState = 0xFF;
   doubleSpeed = false;
   cyclesLeft = 0;
 
   mem.setEmulator(this);
+
+  _bus.map(_cart.get(), 0x0000, 0x7FFF); /* rom */
+  _bus.map(&mem.memory.vramBank, 0x8000, 0x9FFF); /* vram */
+  _bus.map(_cart.get(), 0xA000, 0xBFFF); /* ext ram */
+  _bus.map(&mem.memory.wramBank0, 0xC000, 0xCFFF); /* wram */
+  _bus.map(&mem.memory.wramBank1, 0xD000, 0xDFFF); /* wram */
+  _bus.map(&mem.memory.wramBank0, 0xE000, 0xEFFF); /* echo wram 1 */
+  _bus.map(&mem.memory.wramBank1, 0xF000, 0xFDFF); /* echo wram 2 */
+
+  _bus.map(apu, 0xFF10, 0xFF3F); /* apu ports */
 }
 
 void Gameboy::loadCartridge(const std::string& fileName)
@@ -34,12 +43,9 @@ void Gameboy::loadCartridge(const std::string& fileName)
   init();
 }
 
-void Gameboy::setupSound(int sampleRate)
-{
-#ifndef DEBUGGER
-  sound.start(sampleRate);
-#endif
-}
+void Gameboy::setupSound(int sampleRate) { apu->start(sampleRate); }
+void Gameboy::mute(bool toggle) { apu->mute(toggle); };
+
 
 u8 Gameboy::step()
 {
@@ -172,7 +178,7 @@ bool Gameboy::run(u32 maxCycles)
   
   
   cycles += maxCycles + cyclesLeft;
-  sound.update();
+  apu->update();
   
   return true;
 }

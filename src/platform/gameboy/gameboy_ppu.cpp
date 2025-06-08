@@ -50,7 +50,7 @@ enum STAT_Mask
   STAT_MODE_MASK = 0x03
 };
 
-GpuGB::GpuGB(devices::Bus* bus, Gameboy* system, const EmuSpec& spec) : bus(bus), system(system), width(spec.displayWidth), height(spec.displayHeight),
+GpuGB::GpuGB(devices::Bus* bus, Gameboy* system) : bus(bus), system(system), width(160), height(144),
 bcolors{ccc(28, 31, 26),ccc(17, 24, 14),ccc(4, 13, 11),ccc(1,3,4)}
 {
   priorityMap = new PriorityType[width*height];
@@ -168,15 +168,15 @@ void GpuGB::update(u8 cycles)
     
     // if we reached V-BLANK then raise the interrupt
     if (line == VBLANK_START_LINE)
-      emu.requestInterrupt(INT_VBLANK);
+      system->requestInterrupt(INT_VBLANK);
     // if we got over V-BLANK then reset the counter
     else if (line == VBLANK_END_LINE)
-      mem.rawPortWrite(PORT_LY, VBLANK_END_LINE);
+      bus->poke(PORT_LY, VBLANK_END_LINE);
     else if (line > VBLANK_END_LINE)
     {
       line = 0;
       bus->poke(PORT_LY, 0);
-      setMode(mem.rawPort(PORT_STAT), Mode::OAM_TRANSFER);
+      setMode(bus.rawPort(PORT_STAT), Mode::OAM_TRANSFER);
       memset(priorityMap, PRIORITY_NONE, width*height*sizeof(PriorityType));
     }
     

@@ -31,6 +31,12 @@
     <Filter Include="src\platform\mos">
       <UniqueIdentifier>{fb4538ff-c0da-4373-a2f1-005e2e7857a7}</UniqueIdentifier>
     </Filter>
+    <Filter Include="src\platform\gameboy\blarrg">
+      <UniqueIdentifier>{e026d23a-635a-4657-ad45-edebe34ea8e3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\platform\gameboy\blarrg\gb_apu">
+      <UniqueIdentifier>{be3ec392-77d3-4855-aa93-539a707bcfc9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\..\src\main.cpp">
@@ -89,6 +95,30 @@
     </ClCompile>
     <ClCompile Include="..\..\..\src\platform\gameboy\gameboy_memory.cpp">
       <Filter>src\platform\gameboy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\gameboy_apu.cpp">
+      <Filter>src\platform\gameboy</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\blarrg\Sound_Queue.cpp">
+      <Filter>src\platform\gameboy\blarrg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\blarrg\Basic_Gb_Apu.cpp">
+      <Filter>src\platform\gameboy\blarrg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\blarrg\demo_sdl.cpp">
+      <Filter>src\platform\gameboy\blarrg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\blarrg\gb_apu\Blip_Buffer.cpp">
+      <Filter>src\platform\gameboy\blarrg\gb_apu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\blarrg\gb_apu\Gb_Apu.cpp">
+      <Filter>src\platform\gameboy\blarrg\gb_apu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\blarrg\gb_apu\Gb_Oscs.cpp">
+      <Filter>src\platform\gameboy\blarrg\gb_apu</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\platform\gameboy\blarrg\gb_apu\Multi_Buffer.cpp">
+      <Filter>src\platform\gameboy\blarrg\gb_apu</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -163,6 +193,36 @@
     </ClInclude>
     <ClInclude Include="..\..\..\src\platform\gameboy\gameboy_memory.h">
       <Filter>src\platform\gameboy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\gameboy_apu.h">
+      <Filter>src\platform\gameboy</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\blarrg\Sound_Queue.h">
+      <Filter>src\platform\gameboy\blarrg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\blarrg\Basic_Gb_Apu.h">
+      <Filter>src\platform\gameboy\blarrg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\blarrg\gb_apu\Blip_Buffer.h">
+      <Filter>src\platform\gameboy\blarrg\gb_apu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\blarrg\gb_apu\Blip_Synth.h">
+      <Filter>src\platform\gameboy\blarrg\gb_apu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\blarrg\gb_apu\Gb_Apu.h">
+      <Filter>src\platform\gameboy\blarrg\gb_apu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\blarrg\gb_apu\Gb_Oscs.h">
+      <Filter>src\platform\gameboy\blarrg\gb_apu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\blarrg\gb_apu\Multi_Buffer.h">
+      <Filter>src\platform\gameboy\blarrg\gb_apu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\blarrg\gb_apu\blargg_common.h">
+      <Filter>src\platform\gameboy\blarrg\gb_apu</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\src\platform\gameboy\blarrg\gb_apu\blargg_source.h">
+      <Filter>src\platform\gameboy\blarrg\gb_apu</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
