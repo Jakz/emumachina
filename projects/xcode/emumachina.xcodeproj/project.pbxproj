@@ -7,6 +7,21 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		044E4E222DF609A5006F335C /* gameboy_apu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E172DF609A4006F335C /* gameboy_apu.cpp */; };
+		044E4E232DF609A5006F335C /* gameboy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E1C2DF609A4006F335C /* gameboy.cpp */; };
+		044E4E242DF609A5006F335C /* lr35902.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E1F2DF609A5006F335C /* lr35902.cpp */; };
+		044E4E252DF609A5006F335C /* gameboy_memory.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E202DF609A5006F335C /* gameboy_memory.cpp */; };
+		044E4E262DF609A5006F335C /* gameboy_ppu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E212DF609A5006F335C /* gameboy_ppu.cpp */; };
+		044E4E372DF609EF006F335C /* Blip_Buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E292DF609EF006F335C /* Blip_Buffer.cpp */; };
+		044E4E382DF609EF006F335C /* Basic_Gb_Apu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E2E2DF609EF006F335C /* Basic_Gb_Apu.cpp */; };
+		044E4E392DF609EF006F335C /* Gb_Apu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E302DF609EF006F335C /* Gb_Apu.cpp */; };
+		044E4E3A2DF609EF006F335C /* Gb_Oscs.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E342DF609EF006F335C /* Gb_Oscs.cpp */; };
+		044E4E3B2DF609EF006F335C /* Sound_Queue.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E352DF609EF006F335C /* Sound_Queue.cpp */; };
+		044E4E3C2DF609EF006F335C /* Multi_Buffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E362DF609EF006F335C /* Multi_Buffer.cpp */; };
+		044E4E422DF60A0B006F335C /* mos6502_opcodes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E402DF60A0B006F335C /* mos6502_opcodes.cpp */; };
+		044E4E432DF60A0B006F335C /* mos6502.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E412DF60A0B006F335C /* mos6502.cpp */; };
+		044E4E4B2DF60A2D006F335C /* frame_window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E472DF60A2D006F335C /* frame_window.cpp */; };
+		044E4E4C2DF60A2D006F335C /* window.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 044E4E4A2DF60A2D006F335C /* window.cpp */; };
 		046BD4DF2DED2519001622CC /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD4DE2DED2519001622CC /* main.cpp */; };
 		046BD4EB2DED2582001622CC /* imgui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD4E22DED2582001622CC /* imgui.cpp */; };
 		046BD4EC2DED2582001622CC /* imgui_draw.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD4E52DED2582001622CC /* imgui_draw.cpp */; };
@@ -35,6 +50,41 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		044E4E172DF609A4006F335C /* gameboy_apu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gameboy_apu.cpp; path = ../../src/platform/gameboy/gameboy_apu.cpp; sourceTree = "<group>"; };
+		044E4E182DF609A4006F335C /* gameboy_apu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gameboy_apu.h; path = ../../src/platform/gameboy/gameboy_apu.h; sourceTree = "<group>"; };
+		044E4E192DF609A4006F335C /* lr35902.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = lr35902.h; path = ../../src/platform/gameboy/lr35902.h; sourceTree = "<group>"; };
+		044E4E1A2DF609A4006F335C /* gameboy_memory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gameboy_memory.h; path = ../../src/platform/gameboy/gameboy_memory.h; sourceTree = "<group>"; };
+		044E4E1B2DF609A4006F335C /* gameboy_spec.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gameboy_spec.h; path = ../../src/platform/gameboy/gameboy_spec.h; sourceTree = "<group>"; };
+		044E4E1C2DF609A4006F335C /* gameboy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gameboy.cpp; path = ../../src/platform/gameboy/gameboy.cpp; sourceTree = "<group>"; };
+		044E4E1D2DF609A4006F335C /* gameboy_ppu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gameboy_ppu.h; path = ../../src/platform/gameboy/gameboy_ppu.h; sourceTree = "<group>"; };
+		044E4E1E2DF609A4006F335C /* gameboy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = gameboy.h; path = ../../src/platform/gameboy/gameboy.h; sourceTree = "<group>"; };
+		044E4E1F2DF609A5006F335C /* lr35902.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = lr35902.cpp; path = ../../src/platform/gameboy/lr35902.cpp; sourceTree = "<group>"; };
+		044E4E202DF609A5006F335C /* gameboy_memory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gameboy_memory.cpp; path = ../../src/platform/gameboy/gameboy_memory.cpp; sourceTree = "<group>"; };
+		044E4E212DF609A5006F335C /* gameboy_ppu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = gameboy_ppu.cpp; path = ../../src/platform/gameboy/gameboy_ppu.cpp; sourceTree = "<group>"; };
+		044E4E282DF609EF006F335C /* Gb_Apu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Gb_Apu.h; path = ../../src/platform/gameboy/blarrg/gb_apu/Gb_Apu.h; sourceTree = "<group>"; };
+		044E4E292DF609EF006F335C /* Blip_Buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Blip_Buffer.cpp; path = ../../src/platform/gameboy/blarrg/gb_apu/Blip_Buffer.cpp; sourceTree = "<group>"; };
+		044E4E2A2DF609EF006F335C /* Blip_Buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Blip_Buffer.h; path = ../../src/platform/gameboy/blarrg/gb_apu/Blip_Buffer.h; sourceTree = "<group>"; };
+		044E4E2B2DF609EF006F335C /* Basic_Gb_Apu.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Basic_Gb_Apu.h; path = ../../src/platform/gameboy/blarrg/Basic_Gb_Apu.h; sourceTree = "<group>"; };
+		044E4E2C2DF609EF006F335C /* Blip_Synth.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Blip_Synth.h; path = ../../src/platform/gameboy/blarrg/gb_apu/Blip_Synth.h; sourceTree = "<group>"; };
+		044E4E2D2DF609EF006F335C /* Multi_Buffer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Multi_Buffer.h; path = ../../src/platform/gameboy/blarrg/gb_apu/Multi_Buffer.h; sourceTree = "<group>"; };
+		044E4E2E2DF609EF006F335C /* Basic_Gb_Apu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Basic_Gb_Apu.cpp; path = ../../src/platform/gameboy/blarrg/Basic_Gb_Apu.cpp; sourceTree = "<group>"; };
+		044E4E2F2DF609EF006F335C /* Sound_Queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Sound_Queue.h; path = ../../src/platform/gameboy/blarrg/Sound_Queue.h; sourceTree = "<group>"; };
+		044E4E302DF609EF006F335C /* Gb_Apu.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Gb_Apu.cpp; path = ../../src/platform/gameboy/blarrg/gb_apu/Gb_Apu.cpp; sourceTree = "<group>"; };
+		044E4E312DF609EF006F335C /* blargg_common.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = blargg_common.h; path = ../../src/platform/gameboy/blarrg/gb_apu/blargg_common.h; sourceTree = "<group>"; };
+		044E4E322DF609EF006F335C /* Gb_Oscs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = Gb_Oscs.h; path = ../../src/platform/gameboy/blarrg/gb_apu/Gb_Oscs.h; sourceTree = "<group>"; };
+		044E4E332DF609EF006F335C /* blargg_source.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = blargg_source.h; path = ../../src/platform/gameboy/blarrg/gb_apu/blargg_source.h; sourceTree = "<group>"; };
+		044E4E342DF609EF006F335C /* Gb_Oscs.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Gb_Oscs.cpp; path = ../../src/platform/gameboy/blarrg/gb_apu/Gb_Oscs.cpp; sourceTree = "<group>"; };
+		044E4E352DF609EF006F335C /* Sound_Queue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Sound_Queue.cpp; path = ../../src/platform/gameboy/blarrg/Sound_Queue.cpp; sourceTree = "<group>"; };
+		044E4E362DF609EF006F335C /* Multi_Buffer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = Multi_Buffer.cpp; path = ../../src/platform/gameboy/blarrg/gb_apu/Multi_Buffer.cpp; sourceTree = "<group>"; };
+		044E4E3E2DF60A0B006F335C /* mos6502_opcodes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mos6502_opcodes.h; path = ../../src/platform/mos/mos6502_opcodes.h; sourceTree = "<group>"; };
+		044E4E3F2DF60A0B006F335C /* mos6502.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = mos6502.h; path = ../../src/platform/mos/mos6502.h; sourceTree = "<group>"; };
+		044E4E402DF60A0B006F335C /* mos6502_opcodes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mos6502_opcodes.cpp; path = ../../src/platform/mos/mos6502_opcodes.cpp; sourceTree = "<group>"; };
+		044E4E412DF60A0B006F335C /* mos6502.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = mos6502.cpp; path = ../../src/platform/mos/mos6502.cpp; sourceTree = "<group>"; };
+		044E4E452DF60A1F006F335C /* component.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = component.h; path = ../../src/devices/component.h; sourceTree = "<group>"; };
+		044E4E472DF60A2D006F335C /* frame_window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = frame_window.cpp; path = ../../src/ui/frame_window.cpp; sourceTree = "<group>"; };
+		044E4E482DF60A2D006F335C /* window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = window.h; path = ../../src/ui/window.h; sourceTree = "<group>"; };
+		044E4E492DF60A2D006F335C /* frame_window.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = frame_window.h; path = ../../src/ui/frame_window.h; sourceTree = "<group>"; };
+		044E4E4A2DF60A2D006F335C /* window.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = window.cpp; path = ../../src/ui/window.cpp; sourceTree = "<group>"; };
 		046BD4D32DED24E6001622CC /* emumachina */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = emumachina; sourceTree = BUILT_PRODUCTS_DIR; };
 		046BD4DE2DED2519001622CC /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = main.cpp; path = ../../src/main.cpp; sourceTree = "<group>"; };
 		046BD4E12DED2582001622CC /* imgui_internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = imgui_internal.h; path = ../../../../libs/imgui/imgui_internal.h; sourceTree = "<group>"; };
@@ -77,6 +127,58 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		044E4E272DF609D1006F335C /* blarrg */ = {
+			isa = PBXGroup;
+			children = (
+				044E4E2E2DF609EF006F335C /* Basic_Gb_Apu.cpp */,
+				044E4E2B2DF609EF006F335C /* Basic_Gb_Apu.h */,
+				044E4E312DF609EF006F335C /* blargg_common.h */,
+				044E4E332DF609EF006F335C /* blargg_source.h */,
+				044E4E292DF609EF006F335C /* Blip_Buffer.cpp */,
+				044E4E2A2DF609EF006F335C /* Blip_Buffer.h */,
+				044E4E2C2DF609EF006F335C /* Blip_Synth.h */,
+				044E4E302DF609EF006F335C /* Gb_Apu.cpp */,
+				044E4E282DF609EF006F335C /* Gb_Apu.h */,
+				044E4E342DF609EF006F335C /* Gb_Oscs.cpp */,
+				044E4E322DF609EF006F335C /* Gb_Oscs.h */,
+				044E4E362DF609EF006F335C /* Multi_Buffer.cpp */,
+				044E4E2D2DF609EF006F335C /* Multi_Buffer.h */,
+				044E4E352DF609EF006F335C /* Sound_Queue.cpp */,
+				044E4E2F2DF609EF006F335C /* Sound_Queue.h */,
+			);
+			name = blarrg;
+			sourceTree = "<group>";
+		};
+		044E4E3D2DF609FF006F335C /* mos */ = {
+			isa = PBXGroup;
+			children = (
+				044E4E402DF60A0B006F335C /* mos6502_opcodes.cpp */,
+				044E4E3E2DF60A0B006F335C /* mos6502_opcodes.h */,
+				044E4E412DF60A0B006F335C /* mos6502.cpp */,
+				044E4E3F2DF60A0B006F335C /* mos6502.h */,
+			);
+			name = mos;
+			sourceTree = "<group>";
+		};
+		044E4E442DF60A16006F335C /* devices */ = {
+			isa = PBXGroup;
+			children = (
+				044E4E452DF60A1F006F335C /* component.h */,
+			);
+			name = devices;
+			sourceTree = "<group>";
+		};
+		044E4E462DF60A22006F335C /* ui */ = {
+			isa = PBXGroup;
+			children = (
+				044E4E472DF60A2D006F335C /* frame_window.cpp */,
+				044E4E492DF60A2D006F335C /* frame_window.h */,
+				044E4E4A2DF60A2D006F335C /* window.cpp */,
+				044E4E482DF60A2D006F335C /* window.h */,
+			);
+			name = ui;
+			sourceTree = "<group>";
+		};
 		046BD4CA2DED24E6001622CC = {
 			isa = PBXGroup;
 			children = (
@@ -97,6 +199,8 @@
 		046BD4DD2DED2508001622CC /* src */ = {
 			isa = PBXGroup;
 			children = (
+				044E4E462DF60A22006F335C /* ui */,
+				044E4E442DF60A16006F335C /* devices */,
 				046BD5032DEFC505001622CC /* base */,
 				046BD4FB2DEFC352001622CC /* platform */,
 				046BD4E02DED2565001622CC /* imgui */,
@@ -139,6 +243,7 @@
 		046BD4FB2DEFC352001622CC /* platform */ = {
 			isa = PBXGroup;
 			children = (
+				044E4E3D2DF609FF006F335C /* mos */,
 				046BD4FC2DEFC357001622CC /* gameboy */,
 			);
 			name = platform;
@@ -147,6 +252,18 @@
 		046BD4FC2DEFC357001622CC /* gameboy */ = {
 			isa = PBXGroup;
 			children = (
+				044E4E272DF609D1006F335C /* blarrg */,
+				044E4E172DF609A4006F335C /* gameboy_apu.cpp */,
+				044E4E182DF609A4006F335C /* gameboy_apu.h */,
+				044E4E202DF609A5006F335C /* gameboy_memory.cpp */,
+				044E4E1A2DF609A4006F335C /* gameboy_memory.h */,
+				044E4E212DF609A5006F335C /* gameboy_ppu.cpp */,
+				044E4E1D2DF609A4006F335C /* gameboy_ppu.h */,
+				044E4E1B2DF609A4006F335C /* gameboy_spec.h */,
+				044E4E1C2DF609A4006F335C /* gameboy.cpp */,
+				044E4E1E2DF609A4006F335C /* gameboy.h */,
+				044E4E1F2DF609A5006F335C /* lr35902.cpp */,
+				044E4E192DF609A4006F335C /* lr35902.h */,
 				046BD5012DEFC3C0001622CC /* rtc.cpp */,
 				046BD5002DEFC3C0001622CC /* rtc.h */,
 				046BD4FD2DEFC365001622CC /* cartridge.cpp */,
@@ -224,15 +341,30 @@
 			buildActionMask = 2147483647;
 			files = (
 				046BD5022DEFC3C0001622CC /* rtc.cpp in Sources */,
+				044E4E222DF609A5006F335C /* gameboy_apu.cpp in Sources */,
+				044E4E382DF609EF006F335C /* Basic_Gb_Apu.cpp in Sources */,
+				044E4E422DF60A0B006F335C /* mos6502_opcodes.cpp in Sources */,
 				046BD4F32DED25A0001622CC /* imgui_impl_sdl2.cpp in Sources */,
+				044E4E242DF609A5006F335C /* lr35902.cpp in Sources */,
 				046BD4EC2DED2582001622CC /* imgui_draw.cpp in Sources */,
 				046BD4DF2DED2519001622CC /* main.cpp in Sources */,
 				046BD5082DEFC510001622CC /* file_system.cpp in Sources */,
+				044E4E3A2DF609EF006F335C /* Gb_Oscs.cpp in Sources */,
+				044E4E252DF609A5006F335C /* gameboy_memory.cpp in Sources */,
+				044E4E262DF609A5006F335C /* gameboy_ppu.cpp in Sources */,
 				046BD4FF2DEFC365001622CC /* cartridge.cpp in Sources */,
 				046BD4ED2DED2582001622CC /* imgui_tables.cpp in Sources */,
+				044E4E3C2DF609EF006F335C /* Multi_Buffer.cpp in Sources */,
+				044E4E4C2DF60A2D006F335C /* window.cpp in Sources */,
+				044E4E232DF609A5006F335C /* gameboy.cpp in Sources */,
+				044E4E432DF60A0B006F335C /* mos6502.cpp in Sources */,
 				046BD4EE2DED2582001622CC /* imgui_widgets.cpp in Sources */,
+				044E4E372DF609EF006F335C /* Blip_Buffer.cpp in Sources */,
+				044E4E4B2DF60A2D006F335C /* frame_window.cpp in Sources */,
 				046BD5092DEFC510001622CC /* path.cpp in Sources */,
+				044E4E3B2DF609EF006F335C /* Sound_Queue.cpp in Sources */,
 				046BD4F42DED25A0001622CC /* imgui_impl_sdlrenderer2.cpp in Sources */,
+				044E4E392DF609EF006F335C /* Gb_Apu.cpp in Sources */,
 				046BD4EB2DED2582001622CC /* imgui.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -290,6 +422,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"/Users/jack/Documents/Dev/libs/raylib-cpp-5.5.0/include",
+					"/Users/jack/Documents/Dev/libs/raylib-5.5_macos/include",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -342,6 +478,10 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					"/Users/jack/Documents/Dev/libs/raylib-cpp-5.5.0/include",
+					"/Users/jack/Documents/Dev/libs/raylib-5.5_macos/include",
+				);
 				MACOSX_DEPLOYMENT_TARGET = 12.3;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
