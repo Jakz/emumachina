@@ -6,7 +6,7 @@
 
 using namespace gb;
 
-Memory::Memory() : emu(nullptr)
+Memory::Memory(devices::Bus* bus) : emu(nullptr), _bus(bus)
 {
   init();
 }
@@ -14,38 +14,21 @@ Memory::Memory() : emu(nullptr)
 /* dealloca tutto e rialloca nuova fiammante memoria */
 void Memory::init()
 {
-  
-	memory.oam_table = new u8[160];
-  
   memory.ports_table = new u8[256];
-  
-  memory.color_palette_ram = new u8[128];
-  
+    
   memory.cgbPaletteAutoIncr[0] = false;
   memory.cgbPaletteAutoIncr[1] = false;
   
-  memset(memory.oam_table, 0, 160);
   memset(memory.ports_table, 0, 256);
-  memset(memory.color_palette_ram, 0, 128);
-
 }
 
 Memory::~Memory()
 {
-  delete [] memory.oam_table;
   delete [] memory.ports_table;
-  delete [] memory.color_palette_ram;
 }
 
-u8 Memory::paletteRam(u8 index)
-{
-  return memory.color_palette_ram[index];
-}
-
-u8 *Memory::oam()
-{
-  return memory.oam_table;
-}
+devices::Ram& Memory::paletteRam() { return memory._paletteRam; }
+devices::Ram& Memory::oam() { return memory.oamRam; }
 
 u8 Memory::readVram0(u16 address)
 {
@@ -60,10 +43,7 @@ u8 Memory::readVram1(u16 address)
 u8 Memory::read(u16 address)
 {
   // oam table
-  if (address >= 0xFE00 && address <= 0xFE9F)
-    return memory.oam_table[address - 0xFE00];
-  // not usable
-  else if (address >= 0xFEA0 && address <= 0xFEFF)
+  if (address >= 0xFEA0 && address <= 0xFEFF)
     return -1;
   // ports + HRAM
   else if (address >= 0xFF00)
@@ -75,11 +55,8 @@ u8 Memory::read(u16 address)
 
 void Memory::write(u16 address, u8 value)
 {
-  // oam table
-  if (address >= 0xFE00 && address <= 0xFE9F)
-    memory.oam_table[address - 0xFE00] = value;
   // ports + HRAM
-  else if (address >= 0xFF00)
+  if (address >= 0xFF00)
     trapPortWrite(address, value);
   
   // not usable
@@ -92,25 +69,20 @@ u8 Memory::trapPortRead(u16 address)
   {
     case PORT_JOYP:
     {
-      u8 oldJoyp = rawPortRead(address);
+      u8 oldJoyp = _bus->peek(address);
       u8 joyp = emu->keyPadState(oldJoyp);
-      rawPortWrite(address, joyp);
+      _bus->poke(address, joyp);
       return joyp;
       break;
     }
   }
   
-  return rawPortRead(address);
+  return _bus->peek(address);
 }
 
 
 void Memory::trapPortWrite(u16 address, u8 value)
 {
-  if (address >= PORT_NR10 && address <= 0xFF3F)
-  {
-    emu->sound.write(address, value);
-  }
-  
   switch (address)
   {
     // writing on the divider register will reset it
@@ -126,7 +98,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
     case PORT_TAC:
     {
       //u8 oldValue = read(PORT_TAC);
-      rawPortWrite(address, value);
+      _bus->poke(address, value);
       
       // if frequency of the timer has just to change
       emu->resetTimerCounter();
@@ -165,7 +137,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
       if (bit::bit(value,0))
       {
         // set bit in the speed switch port to be managed by STOP instruction
-        rawPortWrite(PORT_KEY1, rawPortRead(PORT_KEY1) | 0x01);
+        _bus->poke(PORT_KEY1, _bus->peek(PORT_KEY1) | 0x01);
       }
       break;
     }
@@ -197,16 +169,16 @@ void Memory::trapPortWrite(u16 address, u8 value)
     }
     case PORT_BGPD:
     {
-      u8 paletteByte = rawPortRead(PORT_BGPI) & 0x3F;
+      u8 paletteByte = _bus->peek(PORT_BGPI) & 0x3F;
       
-      memory.color_palette_ram[paletteByte] = value;
+      paletteRam()[paletteByte] = value;
       
       printf("Writing %02x at palette %02x\n", value, paletteByte);
       
       // TODO maybe index should wrap?
       if (memory.cgbPaletteAutoIncr[0] /*&& paletteByte < 0x40*/)
       {
-        rawPortWrite(PORT_BGPI, (paletteByte+1)%0x40);
+        _bus->poke(PORT_BGPI, (paletteByte+1)%0x40);
       }
       
       break;
@@ -220,14 +192,14 @@ void Memory::trapPortWrite(u16 address, u8 value)
     }
     case PORT_OBPD:
     {
-      u8 paletteByte = 64 + (rawPortRead(PORT_OBPI) & 0x3F);
+      u8 paletteByte = 64 + (_bus->peek(PORT_OBPI) & 0x3F);
       
-      memory.color_palette_ram[paletteByte] = value;
+      paletteRam()[paletteByte] = value;
       
       // TODO maybe index should wrap?
       if (memory.cgbPaletteAutoIncr[1] /*&& paletteByte < 0x80*/)
       {
-        rawPortWrite(PORT_OBPI, (paletteByte+1)%0x40);
+        _bus->poke(PORT_OBPI, (paletteByte+1)%0x40);
       }
       
       break;
@@ -239,12 +211,12 @@ void Memory::trapPortWrite(u16 address, u8 value)
     case PORT_HDMA5:
     {    
       // compose source address from the two source hdma ports
-      u16 source = (rawPortRead(PORT_HDMA1)<<8) | rawPortRead(PORT_HDMA2);
+      u16 source = (_bus->peek(PORT_HDMA1)<<8) | _bus->peek(PORT_HDMA2);
       // clamp address, lower 4 bits are ignored (0000-7FF0 or A000-DFF0)
       source &= 0xFFF0;
       
       // compose destination address from the two dest hdma ports
-      u16 dest = (rawPortRead(PORT_HDMA3)<<8) | rawPortRead(PORT_HDMA4);
+      u16 dest = (_bus->peek(PORT_HDMA3)<<8) | _bus->peek(PORT_HDMA4);
       // clamp address, lower 4 bits are ignored, 3 higher bits are ignored since destination is always VRAM (8000-9FF0)
       dest = (dest & 0x7FF0) | 0x8000;
       
@@ -285,7 +257,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
     }
     case PORT_LCDC:
     {
-      u8 lcdc = rawPortRead(PORT_LCDC);
+      u8 lcdc = _bus->peek(PORT_LCDC);
       
       //value |= 0x80;
       
@@ -304,22 +276,6 @@ void Memory::trapPortWrite(u16 address, u8 value)
     }
   }
 
-  rawPortWrite(address, value);
-}
-
-
-void Memory::rawPortWrite(u16 address, u8 value)
-{
-  memory.ports_table[address - 0xFF00] = value;
-}
-
-u8 Memory::rawPortRead(u16 address) const
-{
-  if (address >= 0xFF10 && address <= 0xFF3F)
-  {
-    return emu->sound.read(address);
-  }
-
-  return memory.ports_table[address - 0xFF00];
+  _bus->poke(address, value);
 }
 

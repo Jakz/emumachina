@@ -42,19 +42,19 @@ namespace gb
 
   struct MemoryMap
   {
-	  u8 *oam_table;  // 0xFE00-0xFE9F - sprite attribute table	
     u8 *ports_table;
   
-    u8 *color_palette_ram;
-
     devices::Ram vram; // 16kb vram
     devices::Ram wram; // 32kb wram
+    devices::Ram oamRam; // 160 bytes OAM (sprite attribute table)
+    devices::Ram _paletteRam; // 128 bytes color palette RAM (CGB only, 8 palettes of 16 colors each)
+    devices::Ram _ports; // 256 bytes I/O ports (0xFF00-0xFF7F)
 
     devices::AddressableBank vramBank; // 0x8000-0x9FFF (8kb bank switchable in CGB 0-1)
     devices::AddressableBank wramBank0; // 0xC000 - 0xCFFF - 4kb working RAM
     devices::AddressableBank wramBank1; // 0xD000-0xDFFF - 4kb working RAM (switchable 1-7 in CGB)
 
-    MemoryMap() : vram(16_kb), wram(32_kb), vramBank(&vram, 8_kb), wramBank0(&wram, 4_kb), wramBank1(&wram, 4_kb)
+    MemoryMap() : vram(16_kb), wram(32_kb), oamRam(160), _paletteRam(128), _ports(256), vramBank(&vram, 8_kb), wramBank0(&wram, 4_kb), wramBank1(&wram, 4_kb)
     {
       /* default bank for wram1 is the second */
       wramBank1.setBank(1);
@@ -89,32 +89,28 @@ namespace gb
       inline u8 trapPortRead(u16 address);
   
     
+      devices::Bus* _bus;
 
     public:
       MemoryMap memory;
 
 
-      Memory();
+      Memory(devices::Bus* bus);
       ~Memory();
   
       void setEmulator(Emulator* emu) { this->emu = emu; }
 
       u8 read(u16 address) override;
       void write(u16 address, u8 value) override;
-  
-      // this write overrides the normal write function to ports address space to skip any side effect
-      void rawPortWrite(u16 address, u8 value);
-      u8 rawPortRead(u16 address) const;
-      u8& rawPort(u16 address) { return memory.ports_table[address - 0xFF00]; }
-  
+    
       void init();
       
       std::unique_ptr<Cartridge> cart;
   
       u8 readVram0(u16 address);
       u8 readVram1(u16 address);
-      u8 paletteRam(u8 index);
-      u8 *oam();
+      devices::Ram& paletteRam();
+      devices::Ram& oam();
   
       MemoryMap *memoryMap() { return &memory; }
       HDMA *hdmaInfo() { return &hdma; }

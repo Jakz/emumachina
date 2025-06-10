@@ -11,13 +11,13 @@ using namespace gb;
 
 constexpr u32 Gameboy::timerFrequencies[4];
 
-Gameboy::Gameboy() : mem(), cpu(LR35902(*this)), spec(spec), apu(new GBSound()), _cart(new Cartridge())
+Gameboy::Gameboy() : mem(&_bus), cpu(LR35902(this, &_bus)), apu(new GBSound()), _cart(new Cartridge())
 {
   this->timerCounter = 1024;
   this->cycles = 0;
   this->mode = MODE_GB;
   
-  this->display = new GpuGB(&_bus, this, spec);
+  this->display = new GpuGB(&_bus, this);
   
   keysState = 0xFF;
   doubleSpeed = false;
@@ -32,8 +32,10 @@ Gameboy::Gameboy() : mem(), cpu(LR35902(*this)), spec(spec), apu(new GBSound()),
   _bus.map(&mem.memory.wramBank1, 0xD000, 0xDFFF); /* wram */
   _bus.map(&mem.memory.wramBank0, 0xE000, 0xEFFF); /* echo wram 1 */
   _bus.map(&mem.memory.wramBank1, 0xF000, 0xFDFF); /* echo wram 2 */
-
+  _bus.map(&mem.memory.oamRam, 0xFE00, 0xFE9F); /* oam */
+  /* 0xFEA0 - 0xFEFF invalid */
   _bus.map(apu, 0xFF10, 0xFF3F); /* apu ports */
+  _bus.map(&mem.memory._paletteRam, 0xFF00, 0xFF7F); /* HRAM + joypad */
 }
 
 void Gameboy::loadCartridge(const std::string& fileName)
@@ -201,7 +203,7 @@ void Gameboy::init()
 {
   cpu.reset();
   
-  Registers *regs = cpu.regs();
+  auto *regs = cpu.regs();
   
   regs->PC = 0x0100;
   
@@ -215,37 +217,37 @@ void Gameboy::init()
   regs->HL = 0x014D;
   regs->SP = 0xFFFE;
 
-  mem.rawPortWrite(0xFF05, 0x00);
-  mem.rawPortWrite(0xFF06, 0x00);
-  mem.rawPortWrite(0xFF07, 0x00);
-  mem.rawPortWrite(0xFF10, 0x80);
-  mem.rawPortWrite(0xFF11, 0xBF);
-  mem.rawPortWrite(0xFF12, 0xF3);
-  mem.rawPortWrite(0xFF14, 0xBF);
-  mem.rawPortWrite(0xFF16, 0x3F);
-  mem.rawPortWrite(0xFF17, 0x00);
-  mem.rawPortWrite(0xFF19, 0xBF);
-  mem.rawPortWrite(0xFF1A, 0x7F);
-  mem.rawPortWrite(0xFF1B, 0xFF);
-  mem.rawPortWrite(0xFF1C, 0x9F);
-  mem.rawPortWrite(0xFF1E, 0xBF);
-  mem.rawPortWrite(0xFF20, 0xFF);
-  mem.rawPortWrite(0xFF21, 0x00);
-  mem.rawPortWrite(0xFF22, 0x00);
-  mem.rawPortWrite(0xFF23, 0xBF);
-  mem.rawPortWrite(0xFF24, 0x77);
-  mem.rawPortWrite(0xFF25, 0xF3);
-  mem.rawPortWrite(0xFF26, 0xF1);
-  mem.rawPortWrite(0xFF40, 0x91);
-  mem.rawPortWrite(0xFF42, 0x00);
-  mem.rawPortWrite(0xFF43, 0x00);
-  mem.rawPortWrite(0xFF45, 0x00);
-  mem.rawPortWrite(0xFF47, 0xFC);
-  mem.rawPortWrite(0xFF48, 0xFF);
-  mem.rawPortWrite(0xFF49, 0xFF);
-  mem.rawPortWrite(0xFF4A, 0x00);
-  mem.rawPortWrite(0xFF4B, 0x00);
-  mem.rawPortWrite(0xFFFF, 0x00);
+  _bus.poke(0xFF05, 0x00);
+  _bus.poke(0xFF06, 0x00);
+  _bus.poke(0xFF07, 0x00);
+  _bus.poke(0xFF10, 0x80);
+  _bus.poke(0xFF11, 0xBF);
+  _bus.poke(0xFF12, 0xF3);
+  _bus.poke(0xFF14, 0xBF);
+  _bus.poke(0xFF16, 0x3F);
+  _bus.poke(0xFF17, 0x00);
+  _bus.poke(0xFF19, 0xBF);
+  _bus.poke(0xFF1A, 0x7F);
+  _bus.poke(0xFF1B, 0xFF);
+  _bus.poke(0xFF1C, 0x9F);
+  _bus.poke(0xFF1E, 0xBF);
+  _bus.poke(0xFF20, 0xFF);
+  _bus.poke(0xFF21, 0x00);
+  _bus.poke(0xFF22, 0x00);
+  _bus.poke(0xFF23, 0xBF);
+  _bus.poke(0xFF24, 0x77);
+  _bus.poke(0xFF25, 0xF3);
+  _bus.poke(0xFF26, 0xF1);
+  _bus.poke(0xFF40, 0x91);
+  _bus.poke(0xFF42, 0x00);
+  _bus.poke(0xFF43, 0x00);
+  _bus.poke(0xFF45, 0x00);
+  _bus.poke(0xFF47, 0xFC);
+  _bus.poke(0xFF48, 0xFF);
+  _bus.poke(0xFF49, 0xFF);
+  _bus.poke(0xFF4A, 0x00);
+  _bus.poke(0xFF4B, 0x00);
+  _bus.poke(0xFFFF, 0x00);
   
   dividerCounter = CYCLES_PER_DIVIDER_INCR;
   resetTimerCounter();
@@ -257,7 +259,7 @@ void Gameboy::init()
 void Gameboy::timerTrigger()
 {
   /* set TIMA according to TMA */
-  mem.rawPortWrite(PORT_TIMA, mem.read(PORT_TMA));
+  _bus.poke(PORT_TIMA, _bus.peek(PORT_TMA));
   /* request timer interrupt */
   requestInterrupt(INT_TIMER);
 }
@@ -285,7 +287,7 @@ void Gameboy::updateTimers(u16 cycles)
       }
       // just increment it
       else
-        mem.rawPortWrite(PORT_TIMA, counter + 1);
+        _bus.poke(PORT_TIMA, counter + 1);
       
       timerCounter += timerTicks();
     }
@@ -304,7 +306,7 @@ void Gameboy::updateTimers(u16 cycles)
     else ++t;
     
     // write updated value on address by skipping normal procedure
-    mem.rawPortWrite(PORT_DIV, t);
+    _bus.poke(PORT_DIV, t);
     
     // reset counter for next divider increment
     dividerCounter = CYCLES_PER_DIVIDER_INCR + dividerCounter;
@@ -350,7 +352,7 @@ void Gameboy::keyPressed(Key key)
   
   bool isDirectional = key < 4;
   
-  u8 joyp = mem.rawPortRead(PORT_JOYP);
+  u8 joyp = _bus.peek(PORT_JOYP);
   
   if (isChanging && ((isDirectional && !bit::bit(joyp, 4)) || (!isDirectional && !bit::bit(joyp, 5))))
     requestInterrupt(INT_JOYPAD);

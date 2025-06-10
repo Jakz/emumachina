@@ -84,7 +84,5 @@ namespace gb
     void toggleDoubleSpeed(bool value);
 
     void mute(bool toggle);
-
-    EmuSpec spec;
   };
 }

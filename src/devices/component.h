@@ -65,10 +65,8 @@ namespace devices
   public:
     Ram(size_t size) : _data(size, 0) {}
 
-    data_t operator[](addr_t address) const
-    {
-      return _data[address];
-    }
+    data_t operator[](addr_t address) const { return _data[address]; }
+    data_t& operator[](addr_t address) { return _data[address]; }
 
     data_t peek(addr_t address) const override
     {
