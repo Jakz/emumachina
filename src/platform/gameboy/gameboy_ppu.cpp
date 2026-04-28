@@ -108,7 +108,7 @@ void GpuGB::colorsForPalette(DrawLayer layer, u8 index, pixel_t(&palette)[4])
     u16 colors16[4];
     
     for (int i = 0; i < 4; ++i)
-      colors16[i] = (mem.paletteRam(offset + 2*i)) | (mem.paletteRam(offset + 2*i + 1) << 8);
+      colors16[i] = (system->mem.paletteRam()[offset + 2*i] | (system->mem.paletteRam()[offset + 2*i + 1] << 8));
     
     // color layout is XXBBBBBGG GGGRRRRR so 5 bits per component = 32*32*32 colors
     // conversion to rgb is made by multiplying by 8 the raw value even it should be improved
@@ -176,7 +176,7 @@ void GpuGB::update(u8 cycles)
     {
       line = 0;
       bus->poke(PORT_LY, 0);
-      setMode(bus.rawPort(PORT_STAT), Mode::OAM_TRANSFER);
+      setMode(bus->peek(PORT_STAT), Mode::OAM_TRANSFER);
       memset(priorityMap, PRIORITY_NONE, width*height*sizeof(PriorityType));
     }
     
@@ -238,7 +238,7 @@ void GpuGB::manageSTAT()
       willRequestInterrupt = bit::bit(status, STAT_INTERRUPT_HBLANK);
       
       // manage HDMA if it's active
-      HDMA *hdma = mem.hdmaInfo();
+      HDMA *hdma = system->mem.hdmaInfo();
       if (hdma->active)
       {
         --hdma->length;
@@ -246,7 +246,7 @@ void GpuGB::manageSTAT()
         // transfer 16 bytes
         for (int i = 0; i < 0x10; ++i)
         {
-          mem.write(hdma->dest, bus->read(hdma->src));
+          bus->write(hdma->dest, bus->read(hdma->src));
           ++hdma->dest;
           ++hdma->src;
         }
@@ -254,11 +254,11 @@ void GpuGB::manageSTAT()
         if (hdma->length == 0)
         {
           hdma->active = false;
-          mem.rawPortWrite(PORT_HDMA5, 0xFF);
+          bus->poke(PORT_HDMA5, 0xFF);
         }
         else
         {
-          mem.rawPortWrite(PORT_HDMA5, hdma->length);
+          bus->poke(PORT_HDMA5, hdma->length);
         }
       }
     }
@@ -269,7 +269,7 @@ void GpuGB::manageSTAT()
   // if  we switched to a new mode and its interrupt was enabled
   if (willRequestInterrupt && currentMode != mode)
   {
-    emu.requestInterrupt(INT_STAT);
+    system->requestInterrupt(INT_STAT);
   }
   
   // if LY == LYC we should set coincidence bit and request interrupt if the bit is enabled
@@ -279,7 +279,7 @@ void GpuGB::manageSTAT()
     
     if (bit::bit(status, STAT_INTERRUPT_COINCIDENCE))
     {
-      emu.requestInterrupt(INT_STAT);
+      system->requestInterrupt(INT_STAT);
     }
   }
   else
@@ -433,8 +433,8 @@ void GpuGB::drawTiles(u8 line)
     // in CGB mode we should read the tile map data from vram bank 1 to read additional tile attributes
     else
     {
-      u8 index = mem.readVram0(tileMap + TILE_MAP_WIDTH*ty + tx);
-      u8 tileAttributes = mem.readVram1(tileMap + TILE_MAP_WIDTH*ty + tx);
+      u8 index = system->mem.readVram0(tileMap + TILE_MAP_WIDTH*ty + tx);
+      u8 tileAttributes = system->mem.readVram1(tileMap + TILE_MAP_WIDTH*ty + tx);
       
       colorsForPalette(LAYER_BACKGROUND, tileAttributes & 0x07 , colors);
       
@@ -575,14 +575,14 @@ void GpuGB::drawWindow(u8 line)
           tileAddress = tileData + TILE_BYTES_SIZE*(((s8)index)+128);
         
         // get the two bytes for the correct row
-        byte1 = mem.readVram0(tileAddress + py*2);
-        byte2 = mem.readVram0(tileAddress + py*2 + 1);
+        byte1 = system->mem.readVram0(tileAddress + py*2);
+        byte2 = system->mem.readVram0(tileAddress + py*2 + 1);
       }
       // in CGB mode we should read the tile map data from vram bank 1 to read additional tile attributes
       else
       {
-        u8 index = mem.readVram0(tileMap + TILE_MAP_WIDTH*ty + tx);
-        u8 tileAttributes = mem.readVram1(tileMap + TILE_MAP_WIDTH*ty + tx);
+        u8 index = system->mem.readVram0(tileMap + TILE_MAP_WIDTH*ty + tx);
+        u8 tileAttributes = system->mem.readVram1(tileMap + TILE_MAP_WIDTH*ty + tx);
         
         if (bit::bit(tileAttributes, ATTRIB_PRIORITY))
           priorityEnabled = true;
@@ -605,13 +605,13 @@ void GpuGB::drawWindow(u8 line)
         // tile is from vram bank 1
         if (bit::bit(tileAttributes, ATTRIB_VRAM_BANK))
         {
-          byte1 = mem.readVram1(tileAddress + py*2);
-          byte2 = mem.readVram1(tileAddress + py*2 + 1);
+          byte1 = system->mem.readVram1(tileAddress + py*2);
+          byte2 = system->mem.readVram1(tileAddress + py*2 + 1);
         }
         else
         {
-          byte1 = mem.readVram0(tileAddress + py*2);
-          byte2 = mem.readVram0(tileAddress + py*2 + 1);
+          byte1 = system->mem.readVram0(tileAddress + py*2);
+          byte2 = system->mem.readVram0(tileAddress + py*2 + 1);
         }
       }
       
@@ -656,7 +656,7 @@ void GpuGB::drawWindow(u8 line)
 
 void GpuGB::drawSprites(u8 line)
 {
-  u8 *oam = mem.oam();
+  u8 *oam = system->mem.oam();
   u8 *vram = mem.memoryMap()->vram;
   bool hasBgPriority = false;
   
@@ -694,7 +694,7 @@ void GpuGB::drawSprites(u8 line)
     bool flipX = bit::bit(flags, ATTRIB_FLIP_HORIZONTAL);
     
     
-    if (emu.mode == MODE_CGB)
+    if (system->mode == MODE_CGB)
     {
       if (bit::bit(flags, ATTRIB_VRAM_BANK))
         tileData = 8_kb;
@@ -712,7 +712,7 @@ void GpuGB::drawSprites(u8 line)
       
       // if mode is gb mono then just a bit is used for sprite palette, otherwise
       // lower 3 bits are used
-      if (emu.mode == MODE_GB)
+      if (system->mode == MODE_GB)
         colorsForPalette(LAYER_SPRITE, bit::bit(flags, ATTRIB_PALETTE_GB) ? 1 : 0, colors);
       else
         colorsForPalette(LAYER_SPRITE, flags & ATTRIB_PALETTE_CGB_MASK, colors);
