@@ -183,6 +183,13 @@ void GpuGB::update(u8 cycles)
   }
 }
 
+void GpuGB::setMode(devices::addr_t addr, Mode mode) const
+{
+  u8 v = bus->peek(addr) & ~0x03;
+  bus->poke(addr, v | mode);  
+}
+
+
 void GpuGB::manageSTAT()
 {
   u8 status = bus->peek(PORT_STAT);
@@ -354,7 +361,7 @@ void GpuGB::drawTiles(u8 line)
   u8 lcdc = bus->read(PORT_LCDC);
   bool priorityEnabled = false; /* seems to be not the real thing  && emu.mode == MODE_CGB && Utils::bit(lcdc, LCDC_BG_DISPLAY_MODE); */
   
-  const u8 *vram = mem.memoryMap()->vram;
+  const auto& vram = system->mem.memoryMap()->vram;
   
   u16 tileData;
   u16 tileMap;
@@ -656,8 +663,8 @@ void GpuGB::drawWindow(u8 line)
 
 void GpuGB::drawSprites(u8 line)
 {
-  u8 *oam = system->mem.oam();
-  u8 *vram = mem.memoryMap()->vram;
+  auto& oam = system->mem.oam();
+  auto& vram = system->mem.memoryMap()->vram;
   bool hasBgPriority = false;
   
   

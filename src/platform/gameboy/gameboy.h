@@ -5,6 +5,7 @@
 #include "devices/component.h"
 #include "lr35902.h"
 #include "gameboy_memory.h"
+#include "gameboy_spec.h"
 
 namespace gb
 {
@@ -13,7 +14,6 @@ namespace gb
   class Memory;
   class Mos6502;
   class Cartridge;
-  enum Key;
 
   enum Mode
   {

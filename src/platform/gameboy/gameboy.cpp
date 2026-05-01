@@ -11,7 +11,7 @@ using namespace gb;
 
 constexpr u32 Gameboy::timerFrequencies[4];
 
-Gameboy::Gameboy() : mem(&_bus), cpu(LR35902(this, &_bus)), apu(new GBSound()), _cart(new Cartridge())
+Gameboy::Gameboy() : mem(&_bus, this), cpu(LR35902(this, &_bus)), apu(new GBSound()), _cart(new Cartridge())
 {
   this->timerCounter = 1024;
   this->cycles = 0;
@@ -22,8 +22,6 @@ Gameboy::Gameboy() : mem(&_bus), cpu(LR35902(this, &_bus)), apu(new GBSound()), 
   keysState = 0xFF;
   doubleSpeed = false;
   cyclesLeft = 0;
-
-  mem.setEmulator(this);
 
   _bus.map(_cart.get(), 0x0000, 0x7FFF); /* rom */
   _bus.map(&mem.memory.vramBank, 0x8000, 0x9FFF); /* vram */

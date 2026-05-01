@@ -14,8 +14,8 @@
 
 namespace gb
 {
-  class Emulator;
   class Cartridge;
+  class Gameboy;
   
   /*
 	  COME INDIRIZZA LO Z80 SUL GAMEBOY
@@ -77,10 +77,7 @@ namespace gb
 
   class Memory : devices::Addressable
   {
-    private:
-    
-      Emulator* emu;
-  
+    private:  
       HDMA hdma;
   
       // this function is used to intercept writes to the port addresses that may need custom behavior
@@ -90,16 +87,15 @@ namespace gb
   
     
       devices::Bus* _bus;
+      Gameboy* _system;
 
     public:
       MemoryMap memory;
 
 
-      Memory(devices::Bus* bus);
+      Memory(devices::Bus* bus, Gameboy* system);
       ~Memory();
   
-      void setEmulator(Emulator* emu) { this->emu = emu; }
-
       u8 read(u16 address) override;
       void write(u16 address, u8 value) override;
     

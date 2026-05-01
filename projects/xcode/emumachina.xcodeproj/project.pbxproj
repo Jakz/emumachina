@@ -35,6 +35,8 @@
 		046BD5022DEFC3C0001622CC /* rtc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD5012DEFC3C0001622CC /* rtc.cpp */; };
 		046BD5082DEFC510001622CC /* file_system.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD5042DEFC510001622CC /* file_system.cpp */; };
 		046BD5092DEFC510001622CC /* path.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 046BD5052DEFC510001622CC /* path.cpp */; };
+		04BE51652FA166320050480B /* libraylib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 04BE51642FA166290050480B /* libraylib.a */; };
+		04BE51672FA1669D0050480B /* rlImGui.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 04BE51662FA1669D0050480B /* rlImGui.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -112,6 +114,8 @@
 		046BD5052DEFC510001622CC /* path.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = path.cpp; path = ../../src/base/path.cpp; sourceTree = "<group>"; };
 		046BD5062DEFC510001622CC /* path.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = path.h; path = ../../src/base/path.h; sourceTree = "<group>"; };
 		046BD5072DEFC510001622CC /* file_system.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = file_system.h; path = ../../src/base/file_system.h; sourceTree = "<group>"; };
+		04BE51642FA166290050480B /* libraylib.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libraylib.a; path = "../../../libs/raylib-5.5_macos/lib/libraylib.a"; sourceTree = "<group>"; };
+		04BE51662FA1669D0050480B /* rlImGui.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = rlImGui.cpp; path = ../../../../libs/rlImGui/rlImGui.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -120,6 +124,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				046BD4F82DED2658001622CC /* libSDL2.a in Frameworks */,
+				04BE51652FA166320050480B /* libraylib.a in Frameworks */,
 				046BD4F92DED2658001622CC /* libSDL2main.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -213,6 +218,7 @@
 		046BD4E02DED2565001622CC /* imgui */ = {
 			isa = PBXGroup;
 			children = (
+				04BE51662FA1669D0050480B /* rlImGui.cpp */,
 				046BD4EF2DED25A0001622CC /* imgui_impl_sdl2.cpp */,
 				046BD4F22DED25A0001622CC /* imgui_impl_sdl2.h */,
 				046BD4F02DED25A0001622CC /* imgui_impl_sdlrenderer2.cpp */,
@@ -234,6 +240,7 @@
 		046BD4F52DED2658001622CC /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				04BE51642FA166290050480B /* libraylib.a */,
 				046BD4F62DED2658001622CC /* libSDL2.a */,
 				046BD4F72DED2658001622CC /* libSDL2main.a */,
 			);
@@ -364,6 +371,7 @@
 				046BD5092DEFC510001622CC /* path.cpp in Sources */,
 				044E4E3B2DF609EF006F335C /* Sound_Queue.cpp in Sources */,
 				046BD4F42DED25A0001622CC /* imgui_impl_sdlrenderer2.cpp in Sources */,
+				04BE51672FA1669D0050480B /* rlImGui.cpp in Sources */,
 				044E4E392DF609EF006F335C /* Gb_Apu.cpp in Sources */,
 				046BD4EB2DED2582001622CC /* imgui.cpp in Sources */,
 			);
@@ -496,6 +504,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/opt/homebrew/lib,
+					"/Users/jack/Documents/Dev/libs/raylib-5.5_macos/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
@@ -518,6 +527,7 @@
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/opt/homebrew/lib,
+					"/Users/jack/Documents/Dev/libs/raylib-5.5_macos/lib",
 				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};

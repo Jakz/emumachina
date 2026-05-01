@@ -8,6 +8,7 @@
 
 #include "gameboy_spec.h"
 #include "common.h"
+#include "devices/component.h"
 
 namespace gb
 {
@@ -50,7 +51,7 @@ namespace gb
 
     const pixel_t bcolors[4];
 
-    void setMode(u8& reg, Mode mode) const { reg &= ~0x03; reg |= mode; }
+    void setMode(devices::addr_t addr, Mode mode) const;
     void manageSTAT();
     bool isEnabled();
 

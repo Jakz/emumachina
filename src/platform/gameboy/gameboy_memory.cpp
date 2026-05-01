@@ -2,11 +2,12 @@
 
 #include "gameboy_spec.h"
 #include "cartridge.h"
+#include "gameboy.h"
 
 
 using namespace gb;
 
-Memory::Memory(devices::Bus* bus) : emu(nullptr), _bus(bus)
+Memory::Memory(devices::Bus* bus, Gameboy* system) : _bus(bus), _system(system)
 {
   init();
 }
@@ -70,7 +71,7 @@ u8 Memory::trapPortRead(u16 address)
     case PORT_JOYP:
     {
       u8 oldJoyp = _bus->peek(address);
-      u8 joyp = emu->keyPadState(oldJoyp);
+      u8 joyp = _system->keyPadState(oldJoyp);
       _bus->poke(address, joyp);
       return joyp;
       break;
@@ -89,9 +90,9 @@ void Memory::trapPortWrite(u16 address, u8 value)
     //case PORT_LY:
     case PORT_DIV: { 
       value = 0;
-      emu->resetDivCounter();
+      _system->resetDivCounter();
       /* writing on DIV also resets programmable TIMER */
-      emu->resetTimerCounter();
+      _system->resetTimerCounter();
       break;
     }
     // writing on the TAC register will start/stop the timer or change its frequency
@@ -101,7 +102,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
       _bus->poke(address, value);
       
       // if frequency of the timer has just to change
-      emu->resetTimerCounter();
+      _system->resetTimerCounter();
       
       return;
     }
@@ -262,7 +263,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
       //value |= 0x80;
       
       if (bit::bit(lcdc, 7) ^ bit::bit(value, 7))
-        emu->toggleLcdState();
+        _system->toggleLcdState();
       
       //printf("LCDC %.2x\n", value); break;
 
