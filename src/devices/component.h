@@ -119,15 +119,24 @@ namespace devices
     {
       addr_t start, end;
       Addressable* device;
+      bool absolute;
     };
 
     std::vector<BusMapping> _mappings;
 
   public:
+    void clear() { _mappings.clear(); }
+
     void map(Addressable* device, addr_t start, addr_t end)
     {
       assert(end > start);
-      _mappings.push_back({ start, end, device });
+      _mappings.push_back({ start, end, device, false });
+    }
+
+    void mapAbsolute(Addressable* device, addr_t start, addr_t end)
+    {
+      assert(end > start);
+      _mappings.push_back({ start, end, device, true });
     }
 
     uint8_t read(addr_t address) const
@@ -135,7 +144,7 @@ namespace devices
       for (const auto& mapping : _mappings)
       {
         if (address >= mapping.start && address <= mapping.end)
-          return mapping.device->read(address - mapping.start);
+          return mapping.device->read(mapping.absolute ? address : address - mapping.start);
       }
       return 0xFF;
     }
@@ -146,7 +155,7 @@ namespace devices
       {
         if (address >= mapping.start && address <= mapping.end)
         {
-          mapping.device->write(address - mapping.start, value);
+          mapping.device->write(mapping.absolute ? address : address - mapping.start, value);
           return;
         }
       }
@@ -157,7 +166,7 @@ namespace devices
       for (const auto& mapping : _mappings)
       {
         if (address >= mapping.start && address <= mapping.end)
-          return mapping.device->peek(address - mapping.start);
+          return mapping.device->peek(mapping.absolute ? address : address - mapping.start);
       }
       return 0xFF;
     }
@@ -168,7 +177,7 @@ namespace devices
       {
         if (address >= mapping.start && address <= mapping.end)
         {
-          mapping.device->poke(address - mapping.start, value);
+          mapping.device->poke(mapping.absolute ? address : address - mapping.start, value);
           return;
         }
       }

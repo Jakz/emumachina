@@ -30,7 +30,7 @@ namespace gb
   class GpuGB
   {
   private:
-    pixel_t* buffer;
+    pixel_t* buffer = nullptr;
     PriorityType *priorityMap;
     const u32 width, height;
 

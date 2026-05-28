@@ -62,7 +62,6 @@ bcolors{ccc(28, 31, 26),ccc(17, 24, 14),ccc(4, 13, 11),ccc(1,3,4)}
 
 GpuGB::~GpuGB()
 {
-  delete [] buffer;
   delete [] priorityMap;
 }
 
@@ -176,7 +175,7 @@ void GpuGB::update(u8 cycles)
     {
       line = 0;
       bus->poke(PORT_LY, 0);
-      setMode(bus->peek(PORT_STAT), Mode::OAM_TRANSFER);
+      setMode(PORT_STAT, Mode::OAM_TRANSFER);
       memset(priorityMap, PRIORITY_NONE, width*height*sizeof(PriorityType));
     }
     
@@ -202,11 +201,7 @@ void GpuGB::manageSTAT()
     bus->poke(PORT_LY, 0);
     
     // clear current mode by clearing 2 lower bits and then set mode 1
-    setMode(status, Mode::VBLANK);
-    
-    // write status back
-    bus->poke(PORT_STAT, status);
-    
+    setMode(PORT_STAT, Mode::VBLANK);
     return;
   }
   
@@ -271,7 +266,8 @@ void GpuGB::manageSTAT()
     }
   }
   
-  setMode(status, mode);
+  setMode(PORT_STAT, mode);
+  status = bus->peek(PORT_STAT);
   
   // if  we switched to a new mode and its interrupt was enabled
   if (willRequestInterrupt && currentMode != mode)
@@ -300,6 +296,8 @@ void GpuGB::manageSTAT()
 void GpuGB::drawScanline(u8 line)
 {
   //printf("scanline: %d\n", line);
+  if (buffer == nullptr)
+    return;
   
   u8 lcdc = bus->read(PORT_LCDC);
   

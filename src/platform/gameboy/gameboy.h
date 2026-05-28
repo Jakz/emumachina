@@ -43,6 +43,8 @@ namespace gb
     bool doubleSpeed;
     bool lcdChangedState;
 
+    void mapBus();
+
   public:
     Gameboy();
 

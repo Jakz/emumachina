@@ -31,6 +31,23 @@ Memory::~Memory()
 devices::Ram& Memory::paletteRam() { return memory._paletteRam; }
 devices::Ram& Memory::oam() { return memory.oamRam; }
 
+u8 Memory::peek(u16 address) const
+{
+  if (address >= 0xFF00)
+    return memory._ports[address - 0xFF00];
+
+  if (address >= 0xFEA0 && address <= 0xFEFF)
+    return 0xFF;
+
+  return 0xFF;
+}
+
+void Memory::poke(u16 address, u8 value)
+{
+  if (address >= 0xFF00)
+    memory._ports[address - 0xFF00] = value;
+}
+
 u8 Memory::readVram0(u16 address)
 {
   return memory.vram[address - 0x8000];
@@ -45,7 +62,7 @@ u8 Memory::read(u16 address)
 {
   // oam table
   if (address >= 0xFEA0 && address <= 0xFEFF)
-    return -1;
+    return 0xFF;
   // ports + HRAM
   else if (address >= 0xFF00)
     return trapPortRead(address);
@@ -70,15 +87,15 @@ u8 Memory::trapPortRead(u16 address)
   {
     case PORT_JOYP:
     {
-      u8 oldJoyp = _bus->peek(address);
+      u8 oldJoyp = peek(address);
       u8 joyp = _system->keyPadState(oldJoyp);
-      _bus->poke(address, joyp);
+      poke(address, joyp);
       return joyp;
       break;
     }
   }
   
-  return _bus->peek(address);
+  return peek(address);
 }
 
 
@@ -99,7 +116,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
     case PORT_TAC:
     {
       //u8 oldValue = read(PORT_TAC);
-      _bus->poke(address, value);
+      poke(address, value);
       
       // if frequency of the timer has just to change
       _system->resetTimerCounter();
@@ -138,7 +155,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
       if (bit::bit(value,0))
       {
         // set bit in the speed switch port to be managed by STOP instruction
-        _bus->poke(PORT_KEY1, _bus->peek(PORT_KEY1) | 0x01);
+        poke(PORT_KEY1, peek(PORT_KEY1) | 0x01);
       }
       break;
     }
@@ -149,7 +166,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
       u16 address = value << 8;
       
       for (int i = 0; i < 160; ++i)
-        write(0xFE00+i, read(address+i));
+        _bus->write(0xFE00+i, _bus->read(address+i));
       
       return;
     }
@@ -170,7 +187,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
     }
     case PORT_BGPD:
     {
-      u8 paletteByte = _bus->peek(PORT_BGPI) & 0x3F;
+      u8 paletteByte = peek(PORT_BGPI) & 0x3F;
       
       paletteRam()[paletteByte] = value;
       
@@ -179,7 +196,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
       // TODO maybe index should wrap?
       if (memory.cgbPaletteAutoIncr[0] /*&& paletteByte < 0x40*/)
       {
-        _bus->poke(PORT_BGPI, (paletteByte+1)%0x40);
+        poke(PORT_BGPI, (paletteByte+1)%0x40);
       }
       
       break;
@@ -193,14 +210,14 @@ void Memory::trapPortWrite(u16 address, u8 value)
     }
     case PORT_OBPD:
     {
-      u8 paletteByte = 64 + (_bus->peek(PORT_OBPI) & 0x3F);
+      u8 paletteByte = 64 + (peek(PORT_OBPI) & 0x3F);
       
       paletteRam()[paletteByte] = value;
       
       // TODO maybe index should wrap?
       if (memory.cgbPaletteAutoIncr[1] /*&& paletteByte < 0x80*/)
       {
-        _bus->poke(PORT_OBPI, (paletteByte+1)%0x40);
+        poke(PORT_OBPI, (paletteByte+1)%0x40);
       }
       
       break;
@@ -212,12 +229,12 @@ void Memory::trapPortWrite(u16 address, u8 value)
     case PORT_HDMA5:
     {    
       // compose source address from the two source hdma ports
-      u16 source = (_bus->peek(PORT_HDMA1)<<8) | _bus->peek(PORT_HDMA2);
+      u16 source = (peek(PORT_HDMA1)<<8) | peek(PORT_HDMA2);
       // clamp address, lower 4 bits are ignored (0000-7FF0 or A000-DFF0)
       source &= 0xFFF0;
       
       // compose destination address from the two dest hdma ports
-      u16 dest = (_bus->peek(PORT_HDMA3)<<8) | _bus->peek(PORT_HDMA4);
+      u16 dest = (peek(PORT_HDMA3)<<8) | peek(PORT_HDMA4);
       // clamp address, lower 4 bits are ignored, 3 higher bits are ignored since destination is always VRAM (8000-9FF0)
       dest = (dest & 0x7FF0) | 0x8000;
       
@@ -249,7 +266,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
         {
         
           for (int i = 0; i < length * 0x10; ++i)
-            write(dest+i, read(source+i));
+            _bus->write(dest+i, _bus->read(source+i));
         
           value = 0xFF;
         }
@@ -258,7 +275,7 @@ void Memory::trapPortWrite(u16 address, u8 value)
     }
     case PORT_LCDC:
     {
-      u8 lcdc = _bus->peek(PORT_LCDC);
+      u8 lcdc = peek(PORT_LCDC);
       
       //value |= 0x80;
       
@@ -277,6 +294,6 @@ void Memory::trapPortWrite(u16 address, u8 value)
     }
   }
 
-  _bus->poke(address, value);
+  poke(address, value);
 }
 

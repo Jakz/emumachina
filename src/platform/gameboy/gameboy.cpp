@@ -23,6 +23,13 @@ Gameboy::Gameboy() : mem(&_bus, this), cpu(LR35902(this, &_bus)), apu(new GBSoun
   doubleSpeed = false;
   cyclesLeft = 0;
 
+  mapBus();
+}
+
+void Gameboy::mapBus()
+{
+  _bus.clear();
+
   _bus.map(_cart.get(), 0x0000, 0x7FFF); /* rom */
   _bus.map(&mem.memory.vramBank, 0x8000, 0x9FFF); /* vram */
   _bus.map(_cart.get(), 0xA000, 0xBFFF); /* ext ram */
@@ -33,14 +40,15 @@ Gameboy::Gameboy() : mem(&_bus, this), cpu(LR35902(this, &_bus)), apu(new GBSoun
   _bus.map(&mem.memory.oamRam, 0xFE00, 0xFE9F); /* oam */
   /* 0xFEA0 - 0xFEFF invalid */
   _bus.map(apu, 0xFF10, 0xFF3F); /* apu ports */
-  _bus.map(&mem.memory._paletteRam, 0xFF00, 0xFF7F); /* HRAM + joypad */
+  _bus.mapAbsolute(&mem, 0xFF00, 0xFFFF); /* ports, HRAM, interrupt enable */
 }
 
 void Gameboy::loadCartridge(const std::string& fileName)
 {
-  mem.cart.reset(new Cartridge(fileName));
-  mode = mem.cart->isCGB() ? MODE_CGB : MODE_GB;
+  _cart.reset(new Cartridge(fileName));
+  mode = _cart->isCGB() ? MODE_CGB : MODE_GB;
   init();
+  mapBus();
 }
 
 void Gameboy::setupSound(int sampleRate) { apu->start(sampleRate); }
@@ -123,7 +131,7 @@ bool Gameboy::run(u32 maxCycles)
     
     u16& pc = cpu.regs()->PC;
     
-    u8 opcode = mem.read(pc);
+    u8 opcode = _bus.read(pc);
 
     /*if (opcode == 0xF0)
     {

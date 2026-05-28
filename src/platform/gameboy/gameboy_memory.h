@@ -75,7 +75,7 @@ namespace gb
     }
   };
 
-  class Memory : devices::Addressable
+  class Memory : public devices::Addressable
   {
     private:  
       HDMA hdma;
@@ -98,11 +98,11 @@ namespace gb
   
       u8 read(u16 address) override;
       void write(u16 address, u8 value) override;
+      u8 peek(u16 address) const override;
+      void poke(u16 address, u8 value) override;
     
       void init();
-      
-      std::unique_ptr<Cartridge> cart;
-  
+        
       u8 readVram0(u16 address);
       u8 readVram1(u16 address);
       devices::Ram& paletteRam();

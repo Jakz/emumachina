@@ -463,6 +463,45 @@ public:
 
 };
 
+#include "platform/gameboy/gameboy.h"
+#include "platform/gameboy/cartridge.h"
+#include "platform/gameboy/gameboy_ppu.h"
+
+class GeekBoyWindow : public ui::FrameWindow
+{
+protected:
+  gb::Gameboy _gb;
+  std::vector<gb::pixel_t> _displayBuffer;
+
+public:
+  GeekBoyWindow(std::string_view title = "GeekBoy") : ui::FrameWindow(title, 160, 144), _gb(), _displayBuffer(160 * 144)
+  {
+    _gb.display->setBuffer(_displayBuffer.data());
+    _gb.setupSound(44100);
+    _gb.loadCartridge(R"(zelda.gbc)");
+  }
+
+  void update() override
+  {
+    _gb.run(70224); // Run one frame worth of cycles
+
+    for (int y = 0; y < _frameBuffer->height(); ++y)
+    {
+      for (int x = 0; x < _frameBuffer->width(); ++x)
+      {
+        gb::pixel_t pixel = _displayBuffer[y * _frameBuffer->width() + x];
+        _frameBuffer->pixel(x, y) = gfx::Pixel(
+          static_cast<uint8_t>((pixel >> 24) & 0xFF),
+          static_cast<uint8_t>((pixel >> 16) & 0xFF),
+          static_cast<uint8_t>((pixel >> 8) & 0xFF),
+          255);
+      }
+    }
+
+    FrameWindow::update();
+  }
+};
+
 // Main code
 int main(int, char**)
 {
@@ -494,6 +533,9 @@ int main(int, char**)
   auto* frameWindow = new StarfieldWindow();
   frameWindow->update();
   gui.manager.add(frameWindow);
+
+  auto* geekBoyWindow = new GeekBoyWindow();
+  gui.manager.add(geekBoyWindow);
 
   while (!WindowShouldClose())
   {
